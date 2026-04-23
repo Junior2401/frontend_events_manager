@@ -1,0 +1,37 @@
+<div class="card shadow-sm border-0 mb-4">
+
+  <!-- HEADER -->
+  <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+    <h5 class="card-title mb-0 fw-semibold">Détail du type d'événement</h5>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()"><i class="bi bi-arrow-left"></i> Retour</button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-3">Chargement...</p>
+  </div>
+
+  <!-- CONTENT -->
+  <div *ngIf="!isLoading && typeEvenement" class="card-body">
+
+
+    <div class="row mb-3">
+      <div class="col-4 text-muted fw-medium">Libellé</div>
+      <div class="col-8">{{ typeEvenement.libelle }}</div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-4 text-muted fw-medium">Description</div>
+      <div class="col-8">{{ typeEvenement.description || '-' }}</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
+    <button type="button" class="btn btn-primary btn-sm" [routerLink]="['/type-evenements/edit', typeEvenement?.id]" [disabled]="!typeEvenement?.id"><i class="bi bi-pencil-square"></i> Modifier</button>
+    <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/type-evenements/delete', typeEvenement?.id]" [disabled]="!typeEvenement?.id"><i class="bi bi-trash-fill"></i> Supprimer</button>
+  </div>
+
+</div>

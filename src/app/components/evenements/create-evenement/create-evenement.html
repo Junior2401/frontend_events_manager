@@ -1,0 +1,56 @@
+<div class="card card-primary card-outline mb-4">
+  <div class="card-header">
+    <div class="card-title">Nouveau Événement</div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="libelle" class="form-label">Libelle</label>
+          <input id="libelle" type="text" class="form-control" formControlName="libelle">
+        </div>
+
+        <div class="col-md-6">
+          <label for="lieu" class="form-label">Lieu</label>
+          <input id="lieu" type="text" class="form-control" formControlName="lieu">
+        </div>
+
+        <div class="col-md-6">
+          <label for="date" class="form-label">Date</label>
+          <input id="date" type="datetime-local" class="form-control" formControlName="date">
+        </div>
+
+        <div class="col-md-6">
+          <label for="capacite" class="form-label">Capacite</label>
+          <input id="capacite" type="number" class="form-control" formControlName="capacite">
+        </div>
+
+        <div class="col-md-6">
+          <label for="statut" class="form-label">Statut</label>
+          <input id="statut" type="text" class="form-control" formControlName="statut">
+        </div>
+
+        <div class="col-md-6">
+          <label for="typeEvenementId" class="form-label">Type evenement ID</label>
+          <input id="typeEvenementId" type="number" class="form-control" formControlName="typeEvenementId">
+        </div>
+
+        <div class="col-12">
+          <label for="description" class="form-label">Description</label>
+          <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button type="submit" class="btn btn-success float-end" [disabled]="isSubmitting">
+        <i class="bi bi-check-circle"></i> Ajouter
+      </button>
+
+      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
+        <i class="bi bi-arrow-left-circle"></i> Retour
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,1 +1,23 @@
-/* Add your component-specific styles here */
+.app-sidebar {
+  background-color: #064e3b !important; /* Vert forêt très sombre */
+}
+.nav-link.active {
+  background-color: #3b82f6 !important; /* Votre bleu actif */
+  color: white !important;
+}
+/* 2. Force TOUS les éléments du menu en blanc (Texte et Icônes) */
+.sidebar-wrapper .nav-link,
+.sidebar-wrapper .nav-link i,
+.sidebar-wrapper .nav-link p,
+.sidebar-brand .brand-text,
+.sidebar-brand i {
+  color: #ffffff !important;
+  opacity: 1 !important; /* Enlève la transparence par défaut */
+}
+
+.app-header {
+  background-color: #064e3b !important;
+}
+.app-header .nav-link, .app-header .bi {
+  color: white !important;
+}

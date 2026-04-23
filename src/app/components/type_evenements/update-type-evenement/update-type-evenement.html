@@ -1,0 +1,42 @@
+<div class="card card-primary card-outline mb-4">
+  <div class="card-header">
+    <div class="card-title">{{ pageTitle }}</div>
+  </div>
+
+  <div *ngIf="isLoading" class="card-body text-center py-4">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-2 mb-0">Chargement...</p>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <label for="libelle" class="form-label">Libelle</label>
+          <input id="libelle" type="text" class="form-control" formControlName="libelle">
+          <small class="text-danger" *ngIf="form.controls.libelle.touched && form.controls.libelle.invalid">
+            Le libelle est obligatoire (120 caracteres max).
+          </small>
+        </div>
+
+        <div class="col-md-8">
+          <label for="description" class="form-label">Description</label>
+          <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
+          <small class="text-danger" *ngIf="form.controls.description.touched && form.controls.description.invalid">
+            La description est obligatoire (500 caracteres max).
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button type="submit" class="btn btn-warning float-end" [disabled]="isSubmitting">
+        <i class="bi bi-check-circle"></i> Mettre a jour
+      </button>
+
+      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
+        <i class="bi bi-arrow-left-circle"></i> Retour
+      </button>
+    </div>
+  </form>
+</div>

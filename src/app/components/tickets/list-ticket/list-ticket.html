@@ -1,0 +1,66 @@
+<div class="card card-outline card-primary shadow-sm">
+  <div class="card-header border-0 bg-transparent py-3">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="card-title fw-bold mb-0">
+        <i class="bi bi-ticket-perforated-fill text-primary me-2"></i>
+        Liste des Tickets
+      </h3>
+      <div class="card-tools">
+        <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" [routerLink]="['/tickets/create']">
+          <i class="bi bi-plus-circle me-1"></i> Nouveau Ticket
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="text-muted mt-2 small">Chargement...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="table-responsive p-4">
+      <table id="example1" class="table table-hover table-striped align-middle border-top">
+        <thead class="bg-light">
+        <tr>
+          <th>#</th>
+          <th>Numero place</th>
+          <th>Place</th>
+          <th>Prix</th>
+          <th>Statut</th>
+          <th class="text-end px-4">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of tickets; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.numeroPlace }}</td>
+          <td>{{ item.place }}</td>
+          <td>{{ item.prix }}</td>
+          <td>{{ item.statut }}</td>
+          <td class="text-end px-4">
+            <div class="btn-group shadow-sm">
+              <button class="btn btn-sm btn-light border-end text-info" title="Détail" [routerLink]="['/tickets/detail', item.id]" [disabled]="!item.id">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn btn-sm btn-light border-end text-primary" title="Modifier" [routerLink]="['/tickets/edit', item.id]" [disabled]="!item.id">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-sm btn-light text-danger" title="Supprimer" [routerLink]="['/tickets/delete', item.id]" [disabled]="!item.id">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="tickets.length === 0">
+          <td colspan="6" class="text-center text-muted py-5">Aucune donnee disponible.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card-footer bg-transparent border-0 py-3">
+  </div>
+</div>

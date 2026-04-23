@@ -1,0 +1,98 @@
+<div class="row">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="col-12">
+    <div class="alert alert-info text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="text-muted mt-3">Chargement du tableau de bord...</p>
+    </div>
+  </div>
+
+  <!-- Dashboard Cards -->
+  <div *ngIf="!isLoading" class="col-12">
+    <div class="row">
+      <!-- Événements Card -->
+      <div class="col-lg-3 col-6 mb-3">
+        <div class="small-box text-bg-primary">
+          <div class="inner">
+            <h3>{{ evenementsCount }}</h3>
+            <p>Événements</p>
+          </div>
+          <i class="bi bi-calendar-event small-box-icon"></i>
+          <a [routerLink]="['/evenements']" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+            Voir plus <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Tickets Card -->
+      <div class="col-lg-3 col-6 mb-3">
+        <div class="small-box text-bg-success">
+          <div class="inner">
+            <h3>{{ ticketsCount }}</h3>
+            <p>Tickets</p>
+          </div>
+          <i class="bi bi-ticket-perforated small-box-icon"></i>
+          <a [routerLink]="['/tickets']" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+            Voir plus <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Utilisateurs Card -->
+      <div class="col-lg-3 col-6 mb-3">
+        <div class="small-box text-bg-warning">
+          <div class="inner">
+            <h3>{{ utilisateursCount }}</h3>
+            <p>Utilisateurs</p>
+          </div>
+          <i class="bi bi-people small-box-icon"></i>
+          <a [routerLink]="['/utilisateurs']" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+            Voir plus <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Artistes Card -->
+      <div class="col-lg-3 col-6 mb-3">
+        <div class="small-box text-bg-danger">
+          <div class="inner">
+            <h3>{{ artistesCount }}</h3>
+            <p>Artistes</p>
+          </div>
+          <i class="bi bi-mic small-box-icon"></i>
+          <a [routerLink]="['/artistes']" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+            Voir plus <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Administrateurs Card -->
+      <div class="col-lg-3 col-6 mb-3">
+        <div class="small-box text-bg-info">
+          <div class="inner">
+            <h3>{{ administrateursCount }}</h3>
+            <p>Administrateurs</p>
+          </div>
+          <i class="bi bi-shield-lock small-box-icon"></i>
+          <a [routerLink]="['/administrateurs']" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+            Voir plus <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Organisateurs Card -->
+      <div class="col-lg-3 col-6 mb-3">
+        <div class="small-box text-bg-secondary">
+          <div class="inner">
+            <h3>{{ organisateursCount }}</h3>
+            <p>Organisateurs</p>
+          </div>
+          <i class="bi bi-briefcase small-box-icon"></i>
+          <a [routerLink]="['/organisateurs']" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+            Voir plus <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

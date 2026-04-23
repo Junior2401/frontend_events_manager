@@ -9,7 +9,7 @@
           </a>
         </li>
         <li class="nav-item d-none d-md-block">
-          <a href="#" class="nav-link">Home</a>
+          <a routerLink="/accueil" class="nav-link">Accueil</a>
         </li>
       </ul>
 
@@ -47,22 +47,58 @@
     <div class="sidebar-brand">
       <a href="/" class="brand-link">
         <img src="adminlte/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow">
-        <span class="brand-text fw-light">AdminLTE 4</span>
+        <span class="brand-text fw-light"><b>EventManager</b></span>
       </a>
     </div>
     <div class="sidebar-wrapper">
       <nav class="mt-2">
         <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-            <a href="/" class="nav-link active">
-              <i class="nav-icon bi bi-speedometer"></i>
-              <p>Dashboard</p>
+            <a routerLink="/accueil" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-speedometer2"></i>
+              <p>Tableau de Board</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon bi bi-calendar3"></i>
-              <p>Events</p>
+            <a routerLink="/tickets" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-qr-code-scan"></i>
+              <p>Tickets</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/evenements" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-calendar-event"></i>
+              <p>Événements</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/utilisateurs" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-person-lines-fill"></i>
+              <p>Utilisateurs</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/artistes" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-mic"></i>
+              <p>Artistes</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/organisateurs" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-person-workspace"></i>
+              <p>Organisateurs</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/administrateurs" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-person-gear"></i>
+              <p>Administrateurs</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/type-evenements" class="nav-link" routerLinkActive="active bg-primary">
+              <i class="nav-icon bi bi-diagram-3"></i>
+              <p>Type Évènements</p>
             </a>
           </li>
         </ul>
@@ -76,12 +112,12 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h3 class="mb-0">Dashboard</h3>
+            <h3 class="mb-0">{{ currentPageTitle() }}</h3>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-end">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+              <li class="breadcrumb-item" aria-current="page">Accueil</li>
+              <li class="breadcrumb-item active" aria-current="page">{{ currentPageTitle() }}</li>
             </ol>
           </div>
         </div>
@@ -96,11 +132,11 @@
 
   <!-- Footer -->
   <footer class="app-footer">
-    <div class="float-end d-none d-sm-inline">Anything you want</div>
+    <div class="float-end d-none d-sm-inline"></div>
     <strong>
       Copyright &copy; 2014-2024&nbsp;
-      <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+      <a href="https://adminlte.io" class="text-decoration-none">EventManager</a>.
     </strong>
-    All rights reserved.
+    Tous droits reservés.
   </footer>
 </div>

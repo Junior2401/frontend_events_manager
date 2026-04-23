@@ -1,0 +1,107 @@
+/* --- Amélioration Visuelle de la Liste --- */
+
+/* Style pour la card */
+.card-outline.card-primary {
+  border-top: 3px solid #3b82f6 !important;
+}
+
+/* En-tête de table plus aéré */
+thead th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #4b5563;
+}
+
+/* Bordures et espacement du tableau */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(59, 130, 246, 0.04) !important;
+}
+
+/* Personnalisation des badges */
+.badge {
+  font-weight: 600;
+}
+
+/* Groupe de boutons d'action */
+.btn-group .btn {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.875rem;
+}
+
+.btn-group .btn:hover {
+  background-color: #f3f4f6;
+}
+
+/* --- Corrections spécifiques DataTables --- */
+
+/* Alignement des boutons d'export */
+.dt-buttons .btn {
+  margin-right: 5px;
+  background-color: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+  color: #4b5563 !important;
+  border-radius: 4px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+
+.dt-buttons .btn:hover {
+  background-color: #e5e7eb !important;
+}
+
+/* Recherche DataTables */
+::ng-deep .dataTables_filter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+::ng-deep .dataTables_filter input {
+  border-radius: 20px !important;
+  border: 1px solid #dee2e6 !important;
+  padding: 0.4rem 1rem !important;
+  width: 250px !important;
+  margin-left: 10px !important;
+  outline: none !important;
+}
+
+::ng-deep .dataTables_filter input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Pagination */
+::ng-deep .dataTables_paginate {
+  margin-top: 1rem !important;
+}
+
+::ng-deep .page-item.active .page-link {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  border-radius: 8px !important;
+}
+
+::ng-deep .page-link {
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+  color: #4b5563 !important;
+}
+
+/* Info DataTables */
+::ng-deep .dataTables_info {
+  font-size: 0.875rem !important;
+  color: #6b7280 !important;
+}

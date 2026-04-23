@@ -1,0 +1,54 @@
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+    <h5 class="card-title mb-0 fw-semibold">Detail Événement</h5>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()">
+      <i class="bi bi-arrow-left"></i> Retour
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-3">Chargement...</p>
+  </div>
+
+  <div *ngIf="!isLoading && evenement" class="card-body">
+    <div class="row mb-2">
+      <div class="col-4 text-muted">Libelle</div>
+      <div class="col-8">{{ evenement.libelle }}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-4 text-muted">Lieu</div>
+      <div class="col-8">{{ evenement.lieu }}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-4 text-muted">Date</div>
+      <div class="col-8">{{ evenement.date }}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-4 text-muted">Capacite</div>
+      <div class="col-8">{{ evenement.capacite }}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-4 text-muted">Statut</div>
+      <div class="col-8">{{ evenement.statut }}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-4 text-muted">Description</div>
+      <div class="col-8">{{ evenement.description }}</div>
+    </div>
+  </div>
+
+  <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
+    <button type="button" class="btn btn-primary btn-sm" [routerLink]="['/evenements/edit', evenement?.id]" [disabled]="!evenement?.id">
+      <i class="bi bi-pencil-square"></i> Modifier
+    </button>
+    <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/evenements/delete', evenement?.id]" [disabled]="!evenement?.id">
+      <i class="bi bi-trash-fill"></i> Supprimer
+    </button>
+  </div>
+</div>
