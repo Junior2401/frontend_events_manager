@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, RouterLink } from '@angular/router';
+import { RouterModule, RouterLink, ActivatedRoute } from '@angular/router';
 import { AdministrateurApiService } from '../../../services/administrateur-api.service';
 import { Administrateur } from '../../../models/administrateur';
 
@@ -17,14 +17,17 @@ export class ListAdministrateur implements OnInit, AfterViewInit {
   dtOptions: any = {};
   administrateurs: Administrateur[] = [];
   isLoading = true;
+  notification: { message: string, type: string } | null = null;
 
   constructor(
     private administrateurService: AdministrateurApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loadData();
+    this.checkNotifications();
     this.dtOptions = {
       pagingType: 'full_numbers',
       pageLength: 10,
@@ -80,4 +83,44 @@ export class ListAdministrateur implements OnInit, AfterViewInit {
       }
     });
   }
+
+  checkNotifications(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['message']) {
+        this.notification = {
+          message: params['message'],
+          type: params['type'] || 'info'
+        };
+        this.cdr.detectChanges();
+
+        // Auto-fermeture après 5 secondes
+        setTimeout(() => {
+          this.closeNotification();
+        }, 5000);
+      }
+    });
+  }
+
+  closeNotification(): void {
+    this.notification = null;
+    this.cdr.detectChanges();
+  }
+
+  getRoleBadge(role: string): { label: string; class: string; icon: string } {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return { label: 'Super Admin', class: 'bg-danger text-white', icon: 'bi bi-award-fill' };
+      case 'ADMIN':
+        return { label: 'Administrateur', class: 'bg-danger-subtle text-danger', icon: 'bi bi-shield-lock-fill' };
+      case 'MANAGER':
+        return { label: 'Manager', class: 'bg-primary-subtle text-primary', icon: 'bi bi-briefcase-fill' };
+      case 'USER':
+        return { label: 'Utilisateur', class: 'bg-success-subtle text-success', icon: 'bi bi-person-fill' };
+      case 'VIEWER':
+        return { label: 'Lecteur', class: 'bg-secondary-subtle text-secondary', icon: 'bi bi-eye-fill' };
+      default:
+        return { label: role, class: 'bg-light text-muted', icon: 'bi bi-question-circle' };
+    }
+  }
+
 }

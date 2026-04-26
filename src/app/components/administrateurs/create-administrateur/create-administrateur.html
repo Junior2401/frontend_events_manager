@@ -10,44 +10,69 @@
 
   <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="card-body row g-3">
+
+      <!-- NOM -->
       <div class="col-md-6">
-        <label for="nom" class="form-label">Nom</label>
-        <input id="nom" class="form-control" formControlName="nom">
-        <small class="text-danger" *ngIf="form.controls.nom.touched && form.controls.nom.invalid">
+        <label for="nom" class="form-label">
+          Nom <span class="text-danger">*</span>
+        </label>
+        <input id="nom" class="form-control" formControlName="nom" [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('nom')?.touched && form.get('nom')?.invalid">
           Le nom est obligatoire.
-        </small>
+        </div>
       </div>
 
+      <!-- PRENOM -->
       <div class="col-md-6">
-        <label for="prenom" class="form-label">Prenom</label>
-        <input id="prenom" class="form-control" formControlName="prenom">
-        <small class="text-danger" *ngIf="form.controls.prenom.touched && form.controls.prenom.invalid">
-          Le prenom est obligatoire.
-        </small>
+        <label for="prenom" class="form-label">
+          Prénom <span class="text-danger">*</span>
+        </label>
+        <input id="prenom" class="form-control" formControlName="prenom" [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+          Le prénom est obligatoire.
+        </div>
       </div>
 
+      <!-- EMAIL -->
       <div class="col-md-6">
-        <label for="email" class="form-label">Email</label>
-        <input id="email" class="form-control" type="email" formControlName="email">
-        <small class="text-danger" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        <label for="email" class="form-label">
+          Email <span class="text-danger">*</span>
+        </label>
+        <input id="email" class="form-control" type="email" formControlName="email" [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
           Un email valide est obligatoire.
-        </small>
+        </div>
       </div>
 
+      <!-- ROLE -->
       <div class="col-md-6">
-        <label for="role" class="form-label">Role</label>
-        <input id="role" class="form-control" formControlName="role">
-        <small class="text-danger" *ngIf="form.controls.role.touched && form.controls.role.invalid">
-          Le role est obligatoire.
-        </small>
+        <label for="role" class="form-label">
+          Rôle <span class="text-danger">*</span>
+        </label>
+
+        <select id="role" class="form-select" formControlName="role" [class.is-invalid]="form.get('role')?.touched && form.get('role')?.invalid">
+          <option value="" disabled selected>-- Sélectionner un rôle --</option>
+          <option value="SUPER_ADMIN">SuperAdmin</option>
+          <option value="ADMIN">Admin</option>
+          <option value="MANAGER">Manager</option>
+          <option value="USER">User</option>
+        </select>
+
+        <div class="invalid-feedback" *ngIf="form.get('role')?.touched && form.get('role')?.invalid">
+          Le rôle est obligatoire.
+        </div>
       </div>
+
     </div>
 
     <div class="card-footer">
-      <button type="submit" class="btn float-end" [ngClass]="isEditMode ? 'btn-warning' : 'btn-success'" [disabled]="isSubmitting">
-        <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-check-circle'"></i>
-        {{ isEditMode ? 'Mettre a jour' : 'Ajouter' }}
+      <button type="submit"
+              class="btn float-end"
+              [ngClass]="isEditMode ? 'btn-warning' : 'btn-success'"
+              [disabled]="isSubmitting">
+        Ajouter <i class="bi bi-check-circle"></i>
       </button>
+
       <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
         <i class="bi bi-arrow-left-circle"></i> Retour
       </button>

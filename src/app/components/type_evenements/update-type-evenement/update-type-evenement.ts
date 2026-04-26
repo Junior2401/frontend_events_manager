@@ -92,9 +92,13 @@ export class UpdateTypeEvenement implements OnInit {
     }
 
     this.typeEvenementService.deleteTypeEvenement(id).subscribe({
-      next: () => this.loadData(),
+      next: () => {
+        this.loadData();
+        this.cdr.detectChanges();
+      },
       error: (error: unknown) => {
         console.error('Erreur lors de la suppression :', error);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -115,6 +119,7 @@ export class UpdateTypeEvenement implements OnInit {
     };
 
     this.isSubmitting = true;
+    this.cdr.detectChanges();
 
     if (this.isEditMode && this.currentId !== null) {
       this.typeEvenementService.updateTypeEvenement(this.currentId, payload).subscribe({
@@ -122,6 +127,7 @@ export class UpdateTypeEvenement implements OnInit {
         error: (error: unknown) => {
           console.error('Erreur lors de la mise a jour :', error);
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }
       });
       return;
@@ -132,6 +138,7 @@ export class UpdateTypeEvenement implements OnInit {
       error: (error: unknown) => {
         console.error('Erreur lors de la creation :', error);
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -149,10 +156,12 @@ export class UpdateTypeEvenement implements OnInit {
           description: typeEvenement.description
         });
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error: unknown) => {
         console.error('Erreur lors du chargement :', error);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

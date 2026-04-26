@@ -1,32 +1,15 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
+import {CommonModule, NgIf} from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdministrateurApiService } from '../../../services/administrateur-api.service';
 import { Administrateur } from '../../../models/administrateur';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-detail-administrateur',
   standalone: true,
-  imports: [NgIf, RouterLink],
-  template: `
-    <div class="card shadow-sm border-0 mb-4">
-      <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-        <h5 class="card-title mb-0 fw-semibold">Detail administrateur</h5>
-        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()"><i class="bi bi-arrow-left"></i> Retour</button>
-      </div>
-      <div *ngIf="isLoading" class="card-body text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
-      <div *ngIf="!isLoading && administrateur" class="card-body">
-        <div class="row mb-2"><div class="col-4 text-muted">Nom</div><div class="col-8">{{ administrateur.nom }}</div></div>
-        <div class="row mb-2"><div class="col-4 text-muted">Prenom</div><div class="col-8">{{ administrateur.prenom }}</div></div>
-        <div class="row mb-2"><div class="col-4 text-muted">Email</div><div class="col-8">{{ administrateur.email }}</div></div>
-        <div class="row mb-2"><div class="col-4 text-muted">Role</div><div class="col-8">{{ administrateur.role }}</div></div>
-      </div>
-      <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
-        <button type="button" class="btn btn-primary btn-sm" [routerLink]="['/administrateurs/edit', administrateur?.id]" [disabled]="!administrateur?.id"><i class="bi bi-pencil-square"></i> Modifier</button>
-        <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/administrateurs/delete', administrateur?.id]" [disabled]="!administrateur?.id"><i class="bi bi-trash-fill"></i> Supprimer</button>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  templateUrl: './detail-administrateur.html',
   styleUrl: './detail-administrateur.css'
 })
 export class DetailAdministrateur implements OnInit {
@@ -64,4 +47,22 @@ export class DetailAdministrateur implements OnInit {
   onBack(): void {
     this.router.navigate(['/administrateurs']);
   }
+
+  getRoleBadge(role: string): { label: string; class: string; icon: string } {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return { label: 'Super Admin', class: 'bg-danger text-white', icon: 'bi bi-award-fill' };
+      case 'ADMIN':
+        return { label: 'Administrateur', class: 'bg-danger-subtle text-danger', icon: 'bi bi-shield-lock-fill' };
+      case 'MANAGER':
+        return { label: 'Manager', class: 'bg-primary-subtle text-primary', icon: 'bi bi-briefcase-fill' };
+      case 'USER':
+        return { label: 'Utilisateur', class: 'bg-success-subtle text-success', icon: 'bi bi-person-fill' };
+      case 'VIEWER':
+        return { label: 'Lecteur', class: 'bg-secondary-subtle text-secondary', icon: 'bi bi-eye-fill' };
+      default:
+        return { label: role, class: 'bg-light text-muted', icon: 'bi bi-question-circle' };
+    }
+  }
+
 }

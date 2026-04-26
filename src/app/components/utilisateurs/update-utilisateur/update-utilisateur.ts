@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilisateurApiService } from '../../../services/utilisateur-api.service';
@@ -9,24 +9,7 @@ import { Utilisateur } from '../../../models/utilisateur';
   selector: 'app-update-utilisateur',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="card card-warning card-outline mb-4">
-      <div class="card-header"><div class="card-title">Modifier Utilisateur</div></div>
-      <div *ngIf="isLoading" class="card-body text-center py-4"><div class="spinner-border text-primary"></div></div>
-      <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="card-body row g-3">
-          <div class="col-md-6"><label class="form-label">Nom</label><input class="form-control" formControlName="nom"></div>
-          <div class="col-md-6"><label class="form-label">Prenom</label><input class="form-control" formControlName="prenom"></div>
-          <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" formControlName="email"></div>
-          <div class="col-md-6"><label class="form-label">Telephone</label><input class="form-control" formControlName="telephone"></div>
-        </div>
-        <div class="card-footer">
-          <button type="submit" class="btn btn-warning float-end" [disabled]="isSubmitting"><i class="bi bi-check-circle"></i> Mettre a jour</button>
-          <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()"><i class="bi bi-arrow-left-circle"></i> Retour</button>
-        </div>
-      </form>
-    </div>
-  `,
+  templateUrl: './update-utilisateur.html',
   styleUrl: './update-utilisateur.css'
 })
 export class UpdateUtilisateur implements OnInit {
@@ -40,7 +23,13 @@ export class UpdateUtilisateur implements OnInit {
   isLoading = true;
   isSubmitting = false;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private utilisateurService: UtilisateurApiService) {}
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private utilisateurService: UtilisateurApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
@@ -48,10 +37,12 @@ export class UpdateUtilisateur implements OnInit {
       next: (data) => {
         this.form.patchValue({ nom: data.nom, prenom: data.prenom, email: data.email, telephone: data.telephone });
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur API:', err);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -64,10 +55,14 @@ export class UpdateUtilisateur implements OnInit {
     const payload = this.form.getRawValue() as Utilisateur;
     this.isSubmitting = true;
     this.utilisateurService.updateUtilisateur(this.id, payload).subscribe({
-      next: () => this.router.navigate(['/utilisateurs']),
+      next: () => {
+        this.cdr.detectChanges();
+        this.router.navigate(['/utilisateurs']);
+      },
       error: (error) => {
         console.error('Erreur lors de la mise a jour :', error);
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }

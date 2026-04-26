@@ -1,42 +1,24 @@
 <div class="card card-primary card-outline mb-4">
-  <div class="card-header">
-    <div class="card-title">{{ pageTitle }}</div>
-  </div>
-
-  <div *ngIf="isLoading" class="card-body text-center py-4">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-2 mb-0">Chargement...</p>
-  </div>
-
+  <div class="card-header"><div class="card-title">{{ pageTitle }}</div></div>
+  <div *ngIf="isLoading" class="card-body text-center py-4"><div class="spinner-border text-primary"></div></div>
   <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-4">
-          <label for="libelle" class="form-label">Libelle</label>
-          <input id="libelle" type="text" class="form-control" formControlName="libelle">
-          <small class="text-danger" *ngIf="form.controls.libelle.touched && form.controls.libelle.invalid">
-            Le libelle est obligatoire (120 caracteres max).
-          </small>
-        </div>
-
-        <div class="col-md-8">
-          <label for="description" class="form-label">Description</label>
-          <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
-          <small class="text-danger" *ngIf="form.controls.description.touched && form.controls.description.invalid">
-            La description est obligatoire (500 caracteres max).
-          </small>
-        </div>
+    <div class="card-body row g-3">
+      <div class="col-md-12">
+        <label class="form-label">Libellé <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="libelle" [class.is-invalid]="form.get('libelle')?.touched && form.get('libelle')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('libelle')?.errors?.['required']">Le libellé est obligatoire.</div>
+        <div class="invalid-feedback" *ngIf="form.get('libelle')?.errors?.['maxlength']">Le libellé ne doit pas dépasser 120 caractères.</div>
+      </div>
+      <div class="col-md-12">
+        <label class="form-label">Description <span class="text-danger">*</span></label>
+        <textarea class="form-control" rows="3" formControlName="description" [class.is-invalid]="form.get('description')?.touched && form.get('description')?.invalid"></textarea>
+        <div class="invalid-feedback" *ngIf="form.get('description')?.errors?.['required']">La description est obligatoire.</div>
+        <div class="invalid-feedback" *ngIf="form.get('description')?.errors?.['maxlength']">La description ne doit pas dépasser 500 caractères.</div>
       </div>
     </div>
-
     <div class="card-footer">
-      <button type="submit" class="btn btn-success float-end" [disabled]="isSubmitting">
-        <i class="bi bi-check-circle"></i> {{ isEditMode ? 'Mettre a jour' : 'Ajouter' }}
-      </button>
-
-      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
-        <i class="bi bi-arrow-left-circle"></i> Retour
-      </button>
+      <button type="submit" class="btn btn-primary float-end" [disabled]="isSubmitting"><i class="bi bi-check-circle"></i> {{ isEditMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()"><i class="bi bi-arrow-left-circle"></i> Retour</button>
     </div>
   </form>
 </div>

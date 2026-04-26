@@ -1,1 +1,80 @@
-<p>create-artiste works!</p>
+<div class="card card-primary card-outline mb-4">
+  <div class="card-header">
+    <div class="card-title">Nouveau Artiste</div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="card-body row g-3">
+
+      <!-- NOM -->
+      <div class="col-md-6">
+        <label class="form-label">
+          Nom <span class="text-danger">*</span>
+        </label>
+        <input class="form-control" formControlName="nom" [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('nom')?.touched && form.get('nom')?.invalid">
+          Le nom est obligatoire.
+        </div>
+      </div>
+
+      <!-- PRENOM -->
+      <div class="col-md-6">
+        <label class="form-label">
+          Prénom <span class="text-danger">*</span>
+        </label>
+        <input class="form-control" formControlName="prenom" [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+          Le prénom est obligatoire.
+        </div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="col-md-6">
+        <label class="form-label">
+          Email <span class="text-danger">*</span>
+        </label>
+        <input class="form-control" type="email" formControlName="email" [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+          Un email valide est obligatoire.
+        </div>
+      </div>
+
+      <!-- NOM DE SCENE -->
+      <div class="col-md-6">
+        <label class="form-label">
+          Nom de scène <span class="text-danger">*</span>
+        </label>
+        <input class="form-control" formControlName="nomDeScene" [class.is-invalid]="form.get('nomDeScene')?.touched && form.get('nomDeScene')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('nomDeScene')?.touched && form.get('nomDeScene')?.invalid">
+          Le nom de scène est obligatoire.
+        </div>
+      </div>
+
+      <!-- STYLE ARTISTIQUE (SELECT, 1 CHOIX) -->
+      <div class="col-md-6">
+        <label class="form-label">
+          Style artistique <span class="text-danger">*</span>
+        </label>
+        <select class="form-select" formControlName="styleArtistique" [class.is-invalid]="form.get('styleArtistique')?.touched && form.get('styleArtistique')?.invalid">
+          <option value="" disabled>-- Sélectionner un style --</option>
+          <option *ngFor="let style of stylesArtistiques" [value]="style">
+            {{ style }}
+          </option>
+        </select>
+        <div class="invalid-feedback" *ngIf="form.get('styleArtistique')?.touched && form.get('styleArtistique')?.invalid">
+          Le style artistique est obligatoire.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <button type="submit" class="btn btn-success float-end" [disabled]="isSubmitting">
+        <i class="bi bi-check-circle"></i> Ajouter
+      </button>
+      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
+        <i class="bi bi-arrow-left-circle"></i> Retour
+      </button>
+    </div>
+  </form>
+</div>

@@ -12,7 +12,7 @@
   </div>
 
   <!-- CONTENT -->
-  <div *ngIf="!isLoading && typeEvenement" class="card-body text-center py-4">
+  <div *ngIf="!isLoading && typeEvenement" class="card-body bg-warning text-center py-4">
 
     <p class="fs-5">
       Êtes-vous sûr de vouloir supprimer le type d'événement
@@ -42,7 +42,7 @@
           class="btn btn-sm btn-danger w-100"
           (click)="onDelete()"
           [disabled]="isSubmitting">
-          <i class="bi bi-trash-fill"></i> Supprimer
+          Supprimer <i class="bi bi-trash-fill"></i>
         </button>
       </div>
 

@@ -25,7 +25,7 @@ export class ArtisteApiService {
     return this.http.put<Artiste>(`${this.apiUrl}/${id}`, payload);
   }
 
-  deleteArtiste(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteArtiste(id: number): Observable<Artiste> {
+    return this.http.delete<Artiste>(`${this.apiUrl}/${id}`);
   }
 }

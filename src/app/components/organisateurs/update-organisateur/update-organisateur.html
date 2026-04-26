@@ -1,1 +1,38 @@
-<p>update-organisateur works!</p>
+<div class="card card-warning card-outline mb-4">
+  <div class="card-header"><div class="card-title">Modifier Organisateur</div></div>
+  <div *ngIf="isLoading" class="card-body text-center py-4"><div class="spinner-border text-primary"></div></div>
+  <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="card-body row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nom <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="nom" [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
+        <div class="invalid-feedback">Le nom est obligatoire.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Prenom <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="prenom" [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+        <div class="invalid-feedback">Le prénom est obligatoire.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Email <span class="text-danger">*</span></label>
+        <input class="form-control" type="email" formControlName="email" [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
+        <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['required']">L'email est obligatoire.</div>
+        <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['email']">Veuillez entrer un email valide.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Societe <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="societe" [class.is-invalid]="form.get('societe')?.touched && form.get('societe')?.invalid">
+        <div class="invalid-feedback">La société est obligatoire.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Telephone pro <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="telephonePro" [class.is-invalid]="form.get('telephonePro')?.touched && form.get('telephonePro')?.invalid">
+        <div class="invalid-feedback">Le téléphone professionnel est obligatoire.</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button type="submit" class="btn btn-warning float-end" [disabled]="isSubmitting"><i class="bi bi-check-circle"></i> Mettre a jour</button>
+      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()"><i class="bi bi-arrow-left-circle"></i> Retour</button>
+    </div>
+  </form>
+</div>

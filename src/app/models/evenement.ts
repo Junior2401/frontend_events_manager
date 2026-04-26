@@ -1,3 +1,7 @@
+import { TypeEvenement } from './type-evenement';
+import { Artiste } from './artiste';
+import { Organisateur } from './organisateur';
+
 export interface Evenement {
   id?: number;
   libelle: string;
@@ -7,4 +11,12 @@ export interface Evenement {
   description: string;
   statut: string;
   typeEvenementId: number;
+  typeEvenement?: TypeEvenement;
+  artistes?: Artiste[];
+  organisateurs?: Organisateur[];
+  artistesIds?: number[];
+  organisateursIds?: number[];
+  ticketsVendus?: number;
+  placesDisponibles?: number;
+  typesPlace?: string[];
 }

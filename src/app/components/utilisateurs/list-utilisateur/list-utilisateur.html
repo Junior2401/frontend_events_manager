@@ -14,6 +14,15 @@
   </div>
 
   <div class="card-body p-0">
+    <!-- Notification -->
+    <div *ngIf="notification" class="px-4 pt-3">
+      <div [class]="'alert alert-' + notification.type + ' alert-dismissible fade show'" role="alert">
+        <i [class]="notification.type === 'success' ? 'bi bi-check-circle-fill me-2' : 'bi bi-exclamation-triangle-fill me-2'"></i>
+        {{ notification.message }}
+        <button type="button" class="btn-close" (click)="closeNotification()" aria-label="Close"></button>
+      </div>
+    </div>
+
     <div *ngIf="isLoading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status"></div>
       <p class="text-muted mt-2 small">Chargement...</p>
@@ -37,7 +46,7 @@
           <td>{{ item.nom }}</td>
           <td>{{ item.prenom }}</td>
           <td>{{ item.email }}</td>
-          <td>{{ item.telephone }}</td>
+          <td>{{ formatPhone(item.telephone) }}</td>
           <td class="text-end px-4">
             <div class="btn-group shadow-sm">
               <button class="btn btn-sm btn-light border-end text-info" title="Détail" [routerLink]="['/utilisateurs/detail', item.id]" [disabled]="!item.id">

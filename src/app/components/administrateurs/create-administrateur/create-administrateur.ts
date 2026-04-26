@@ -69,6 +69,7 @@ export class CreateAdministrateur implements OnInit {
         error: (error: unknown) => {
           console.error('Erreur lors de la mise a jour :', error);
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }
       });
       return;
@@ -79,6 +80,7 @@ export class CreateAdministrateur implements OnInit {
       error: (error: unknown) => {
         console.error('Erreur lors de la creation :', error);
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }

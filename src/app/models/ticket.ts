@@ -1,3 +1,6 @@
+import { Evenement } from './evenement';
+import { Utilisateur } from './utilisateur';
+
 export interface Ticket {
   id?: number;
   numeroPlace: string;
@@ -11,4 +14,6 @@ export interface Ticket {
   utilisateurId: number;
   evenementLibelle?: string;
   utilisateurNomComplet?: string;
+  evenement?: Evenement;
+  utilisateur?: Utilisateur;
 }

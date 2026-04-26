@@ -1,7 +1,7 @@
 import {
   Component, OnInit, ChangeDetectorRef
 } from '@angular/core';
-import { RouterModule, RouterLink } from '@angular/router';
+import { RouterModule, RouterLink, ActivatedRoute } from '@angular/router';
 import { TypeEvenementApiService } from '../../../services/type-evenement-api.service';
 import { TypeEvenement } from '../../../models/type-evenement';
 import { CommonModule } from '@angular/common';
@@ -17,14 +17,17 @@ export class ListTypeEvenement implements OnInit {
 
   typeEvenements: TypeEvenement[] = [];
   isLoading = true;
+  notification: { message: string, type: string } | null = null;
 
   constructor(
     private typeEvenementService: TypeEvenementApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loadData();
+    this.checkNotifications();
   }
 
   loadData(): void {
@@ -42,5 +45,27 @@ export class ListTypeEvenement implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  checkNotifications(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['message']) {
+        this.notification = {
+          message: params['message'],
+          type: params['type'] || 'info'
+        };
+        this.cdr.detectChanges();
+
+        // Auto-fermeture après 5 secondes
+        setTimeout(() => {
+          this.closeNotification();
+        }, 5000);
+      }
+    });
+  }
+
+  closeNotification(): void {
+    this.notification = null;
+    this.cdr.detectChanges();
   }
 }

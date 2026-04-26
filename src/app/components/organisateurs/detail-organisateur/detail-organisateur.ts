@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { OrganisateurApiService } from '../../../services/organisateur-api.service';
 import { Organisateur } from '../../../models/organisateur';
@@ -7,26 +7,8 @@ import { Organisateur } from '../../../models/organisateur';
 @Component({
   selector: 'app-detail-organisateur',
   standalone: true,
-  imports: [NgIf, RouterLink],
-  template: `
-    <div class="card shadow-sm border-0 mb-4">
-      <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-        <h5 class="card-title mb-0 fw-semibold">Detail organisateur</h5>
-        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()"><i class="bi bi-arrow-left"></i> Retour</button>
-      </div>
-      <div *ngIf="isLoading" class="card-body text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
-      <div *ngIf="!isLoading && organisateur" class="card-body">
-        <div class="row mb-2"><div class="col-4 text-muted">Nom</div><div class="col-8">{{ organisateur.nom }}</div></div>
-        <div class="row mb-2"><div class="col-4 text-muted">Prenom</div><div class="col-8">{{ organisateur.prenom }}</div></div>
-        <div class="row mb-2"><div class="col-4 text-muted">Email</div><div class="col-8">{{ organisateur.email }}</div></div>
-        <div class="row mb-2"><div class="col-4 text-muted">Societe</div><div class="col-8">{{ organisateur.societe }}</div></div>
-      </div>
-      <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
-        <button type="button" class="btn btn-primary btn-sm" [routerLink]="['/organisateurs/edit', organisateur?.id]" [disabled]="!organisateur?.id"><i class="bi bi-pencil-square"></i> Modifier</button>
-        <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/organisateurs/delete', organisateur?.id]" [disabled]="!organisateur?.id"><i class="bi bi-trash-fill"></i> Supprimer</button>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, NgIf, RouterLink],
+  templateUrl: './detail-organisateur.html',
   styleUrl: './detail-organisateur.css'
 })
 export class DetailOrganisateur implements OnInit {
@@ -49,6 +31,29 @@ export class DetailOrganisateur implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  formatDate(date: any): string {
+    if (!date) return '-';
+    if (Array.isArray(date)) {
+      const [year, month, day, hour, minute] = date;
+      return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} ${String(hour ?? 0).padStart(2, '0')}:${String(minute ?? 0).padStart(2, '0')}`;
+    }
+    try {
+      const d = new Date(date);
+      return d.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return date;
+    }
+  }
+
+  formatPhone(phone: string | undefined): string {
+    if (!phone) return '-';
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+    }
+    return phone;
   }
 
   onBack(): void {

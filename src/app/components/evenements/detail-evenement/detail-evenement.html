@@ -1,6 +1,6 @@
 <div class="card shadow-sm border-0 mb-4">
   <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-    <h5 class="card-title mb-0 fw-semibold">Detail Événement</h5>
+    <h5 class="card-title mb-0 fw-semibold">Détail Événement</h5>
     <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()">
       <i class="bi bi-arrow-left"></i> Retour
     </button>
@@ -8,38 +8,132 @@
 
   <div *ngIf="isLoading" class="card-body text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-3">Chargement...</p>
+    <p class="text-muted mt-3">Chargement des détails...</p>
   </div>
 
   <div *ngIf="!isLoading && evenement" class="card-body">
-    <div class="row mb-2">
-      <div class="col-4 text-muted">Libelle</div>
-      <div class="col-8">{{ evenement.libelle }}</div>
+    
+    <!-- STATISTIQUES DE VENTE -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="p-3 border rounded bg-light shadow-sm">
+          <div class="d-flex justify-content-between align-items-end mb-2">
+            <div>
+              <h6 class="fw-bold mb-0 text-uppercase small text-muted">Suivi des places</h6>
+              <div class="fs-4 fw-bold text-primary">{{ evenement?.ticketsVendus || 0 }} / {{ evenement?.capacite }}</div>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-success" *ngIf="(evenement?.placesDisponibles || 0) > 10">
+                {{ evenement?.placesDisponibles }} places disponibles
+              </span>
+              <span class="badge bg-warning text-dark" *ngIf="(evenement?.placesDisponibles || 0) <= 10 && (evenement?.placesDisponibles || 0) > 0">
+                Attention : {{ evenement?.placesDisponibles }} places restantes
+              </span>
+              <span class="badge bg-danger" *ngIf="(evenement?.placesDisponibles || 0) === 0">
+                COMPLET
+              </span>
+            </div>
+          </div>
+          <div class="progress border" style="height: 12px;">
+            <div [class]="'progress-bar progress-bar-striped progress-bar-animated ' + 
+                          (fillPercentage > 90 ? 'bg-danger' : (fillPercentage > 70 ? 'bg-warning' : 'bg-success'))" 
+                 role="progressbar" 
+                 [style.width.%]="fillPercentage">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row mb-2">
-      <div class="col-4 text-muted">Lieu</div>
-      <div class="col-8">{{ evenement.lieu }}</div>
-    </div>
+    <div class="row">
+      <!-- COLONNE GAUCHE : INFOS GENERALES -->
+      <div class="col-md-6 border-end">
+        <h6 class="text-primary fw-bold mb-3 border-bottom pb-2">Informations Générales</h6>
+        
+        <div class="row mb-2">
+          <div class="col-5 text-muted small">Libellé</div>
+          <div class="col-7 fw-semibold">{{ evenement?.libelle }}</div>
+        </div>
 
-    <div class="row mb-2">
-      <div class="col-4 text-muted">Date</div>
-      <div class="col-8">{{ evenement.date }}</div>
-    </div>
+        <div class="row mb-2">
+          <div class="col-5 text-muted small">Type d'Événement</div>
+          <div class="col-7">
+            <span class="badge bg-info text-dark" *ngIf="evenement?.typeEvenement">
+              {{ evenement?.typeEvenement?.libelle }}
+            </span>
+          </div>
+        </div>
 
-    <div class="row mb-2">
-      <div class="col-4 text-muted">Capacite</div>
-      <div class="col-8">{{ evenement.capacite }}</div>
-    </div>
+        <div class="row mb-2">
+          <div class="col-5 text-muted small">Lieu</div>
+          <div class="col-7">{{ evenement?.lieu }}</div>
+        </div>
 
-    <div class="row mb-2">
-      <div class="col-4 text-muted">Statut</div>
-      <div class="col-8">{{ evenement.statut }}</div>
-    </div>
+        <div class="row mb-2">
+          <div class="col-5 text-muted small">Date</div>
+          <div class="col-7">{{ formatDate(evenement?.date) }}</div>
+        </div>
 
-    <div class="row mb-2">
-      <div class="col-4 text-muted">Description</div>
-      <div class="col-8">{{ evenement.description }}</div>
+        <div class="row mb-2">
+          <div class="col-5 text-muted small">Statut</div>
+          <div class="col-7">
+            <span [class]="'badge ' + getStatusBadgeClass(evenement?.statut)">
+              {{ getStatusLabel(evenement?.statut) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="row mb-2">
+          <div class="col-5 text-muted small">Description</div>
+          <div class="col-7 text-wrap small">{{ evenement?.description }}</div>
+        </div>
+
+        <!-- TYPES DE PLACES -->
+        <h6 class="text-primary fw-bold mb-3 border-bottom pb-2 mt-4">Types de Places</h6>
+        <div *ngIf="evenement?.typesPlace && evenement?.typesPlace?.length! > 0; else noTypesPlace">
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-outline-secondary border text-dark fw-normal" *ngFor="let tp of evenement?.typesPlace">
+              <i class="bi bi-tag-fill text-secondary me-1"></i> {{ tp }}
+            </span>
+          </div>
+        </div>
+        <ng-template #noTypesPlace>
+          <p class="text-muted small">Aucun type de place configuré.</p>
+        </ng-template>
+      </div>
+
+      <!-- COLONNE DROITE : ARTISTES ET ORGANISATEURS -->
+      <div class="col-md-6 ps-md-4">
+        <h6 class="text-primary fw-bold mb-3 border-bottom pb-2 mt-4 mt-md-0">Participants</h6>
+        
+        <!-- ARTISTES -->
+        <p class="fw-bold small mb-1">Artistes :</p>
+        <div *ngIf="evenement?.artistes && evenement?.artistes?.length! > 0; else noArtistes">
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item py-1 px-0 bg-transparent border-0 small" *ngFor="let a of evenement?.artistes">
+              <i class="bi bi-music-note-beamed text-primary me-2"></i>
+              {{ a.nomDeScene }} <span class="text-muted">({{ a.prenom }} {{ a.nom }})</span>
+            </li>
+          </ul>
+        </div>
+        <ng-template #noArtistes>
+          <p class="text-muted small mb-3">Aucun artiste affecté.</p>
+        </ng-template>
+
+        <!-- ORGANISATEURS -->
+        <p class="fw-bold small mb-1">Organisateurs :</p>
+        <div *ngIf="evenement?.organisateurs && evenement?.organisateurs?.length! > 0; else noOrgs">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item py-1 px-0 bg-transparent border-0 small" *ngFor="let o of evenement?.organisateurs">
+              <i class="bi bi-building text-primary me-2"></i>
+              {{ o.societe }} <span class="text-muted">({{ o.nom }})</span>
+            </li>
+          </ul>
+        </div>
+        <ng-template #noOrgs>
+          <p class="text-muted small">Aucun organisateur affecté.</p>
+        </ng-template>
+      </div>
     </div>
   </div>
 

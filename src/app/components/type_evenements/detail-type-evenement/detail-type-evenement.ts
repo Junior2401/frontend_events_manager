@@ -7,8 +7,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 @Component({
   selector: 'app-detail-type-evenement',
   imports: [
-    NgIf,
-    RouterLink
+    NgIf
   ],
   templateUrl: './detail-type-evenement.html',
   styleUrl: './detail-type-evenement.css',

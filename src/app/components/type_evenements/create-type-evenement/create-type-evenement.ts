@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TypeEvenementApiService } from '../../../services/type-evenement-api.service';
@@ -27,7 +27,8 @@ export class CreateTypeEvenement implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private typeEvenementService: TypeEvenementApiService
+    private typeEvenementService: TypeEvenementApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -60,20 +61,28 @@ export class CreateTypeEvenement implements OnInit {
 
     if (this.isEditMode && this.currentId !== null) {
       this.typeEvenementService.updateTypeEvenement(this.currentId, payload).subscribe({
-        next: () => this.router.navigate(['/type-evenements']),
+        next: () => {
+          this.cdr.detectChanges();
+          this.router.navigate(['/type-evenements']);
+        },
         error: (error: unknown) => {
           console.error('Erreur lors de la mise a jour :', error);
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }
       });
       return;
     }
 
     this.typeEvenementService.createTypeEvenement(payload).subscribe({
-      next: () => this.router.navigate(['/type-evenements']),
+      next: () => {
+        this.cdr.detectChanges();
+        this.router.navigate(['/type-evenements']);
+      },
       error: (error: unknown) => {
         console.error('Erreur lors de la creation :', error);
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -91,10 +100,12 @@ export class CreateTypeEvenement implements OnInit {
           description: typeEvenement.description
         });
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error: unknown) => {
         console.error('Erreur lors du chargement :', error);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

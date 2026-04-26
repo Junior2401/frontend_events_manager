@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TypeEvenementApiService } from '../../../services/type-evenement-api.service';
@@ -9,7 +9,7 @@ import { TypeEvenement } from '../../../models/type-evenement';
   standalone: true,
   imports: [CommonModule, NgIf],
   templateUrl: './delete-type-evenement.html',
-  styleUrl: './delete-type-evenement.css',
+  styleUrls: ['./delete-type-evenement.css'],
 })
 export class DeleteTypeEvenement implements OnInit {
 
@@ -21,7 +21,8 @@ export class DeleteTypeEvenement implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private typeEvenementService: TypeEvenementApiService
+    private typeEvenementService: TypeEvenementApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -31,15 +32,16 @@ export class DeleteTypeEvenement implements OnInit {
 
   loadData(id: number): void {
     this.isLoading = true;
-
     this.typeEvenementService.getTypeEvenementById(id).subscribe({
       next: (data) => {
         this.typeEvenement = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur API:', err);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -52,15 +54,18 @@ export class DeleteTypeEvenement implements OnInit {
     if (!this.id) return;
 
     this.isSubmitting = true;
+    this.cdr.detectChanges();
 
     this.typeEvenementService.deleteTypeEvenement(this.id).subscribe({
       next: () => {
         this.isSubmitting = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/type-evenements']);
       },
       error: (error) => {
         console.error('Erreur lors de la suppression :', error);
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }

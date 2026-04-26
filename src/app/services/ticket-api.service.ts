@@ -17,6 +17,10 @@ export class TicketApiService {
     return this.http.get<Ticket>(`${this.apiUrl}/${id}`);
   }
 
+  getTicketsByEvenement(evenementId: number): Observable<Ticket[]> {
+    return this.http.get<Ticket[]>(`${this.apiUrl}/evenement/${evenementId}`);
+  }
+
   createTicket(payload: Ticket): Observable<Ticket> {
     return this.http.post<Ticket>(this.apiUrl, payload);
   }

@@ -7,38 +7,105 @@
     <div class="card-body">
       <div class="row g-3">
         <div class="col-md-6">
-          <label for="libelle" class="form-label">Libelle</label>
-          <input id="libelle" type="text" class="form-control" formControlName="libelle">
+          <label for="libelle" class="form-label">Libelle <span class="text-danger">*</span></label>
+          <input id="libelle" type="text" class="form-control" formControlName="libelle" [class.is-invalid]="form.get('libelle')?.touched && form.get('libelle')?.invalid">
+          <div class="invalid-feedback" *ngIf="form.get('libelle')?.touched && form.get('libelle')?.invalid">Ce champ est obligatoire.</div>
         </div>
 
         <div class="col-md-6">
-          <label for="lieu" class="form-label">Lieu</label>
-          <input id="lieu" type="text" class="form-control" formControlName="lieu">
+          <label for="lieu" class="form-label">Lieu <span class="text-danger">*</span></label>
+          <input id="lieu" type="text" class="form-control" formControlName="lieu" [class.is-invalid]="form.get('lieu')?.touched && form.get('lieu')?.invalid">
+          <div class="invalid-feedback" *ngIf="form.get('lieu')?.touched && form.get('lieu')?.invalid">Ce champ est obligatoire.</div>
         </div>
 
         <div class="col-md-6">
-          <label for="date" class="form-label">Date</label>
-          <input id="date" type="datetime-local" class="form-control" formControlName="date">
+          <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+          <input id="date" type="datetime-local" class="form-control" formControlName="date" [class.is-invalid]="form.get('date')?.touched && form.get('date')?.invalid">
+          <div class="invalid-feedback" *ngIf="form.get('date')?.touched && form.get('date')?.invalid">Ce champ est obligatoire.</div>
         </div>
 
         <div class="col-md-6">
-          <label for="capacite" class="form-label">Capacite</label>
-          <input id="capacite" type="number" class="form-control" formControlName="capacite">
+          <label for="capacite" class="form-label">Capacite <span class="text-danger">*</span></label>
+          <input id="capacite" type="number" class="form-control" formControlName="capacite" [class.is-invalid]="form.get('capacite')?.touched && form.get('capacite')?.invalid">
+          <div class="invalid-feedback" *ngIf="form.get('capacite')?.touched && form.get('capacite')?.invalid">
+            <span *ngIf="form.get('capacite')?.errors?.['required']">Ce champ est obligatoire.</span>
+            <span *ngIf="form.get('capacite')?.errors?.['min']">La capacité doit être d'au moins 1.</span>
+          </div>
         </div>
 
         <div class="col-md-6">
-          <label for="statut" class="form-label">Statut</label>
-          <input id="statut" type="text" class="form-control" formControlName="statut">
+          <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
+          <input id="statut" type="text" class="form-control bg-light" value="Créé" readonly>
+          <input type="hidden" formControlName="statut">
         </div>
 
         <div class="col-md-6">
-          <label for="typeEvenementId" class="form-label">Type evenement ID</label>
-          <input id="typeEvenementId" type="number" class="form-control" formControlName="typeEvenementId">
+          <label for="typeEvenementId" class="form-label">Type evenement <span class="text-danger">*</span></label>
+          <select id="typeEvenementId" class="form-select" formControlName="typeEvenementId" [class.is-invalid]="form.get('typeEvenementId')?.touched && form.get('typeEvenementId')?.invalid">
+            <option value="null" disabled selected>Choisir un type</option>
+            <option *ngFor="let type of typeEvenements" [value]="type.id">{{ type.libelle }}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('typeEvenementId')?.touched && form.get('typeEvenementId')?.invalid">
+            <span *ngIf="form.get('typeEvenementId')?.errors?.['required']">Ce champ est obligatoire.</span>
+            <span *ngIf="form.get('typeEvenementId')?.errors?.['min']">Veuillez choisir un type valide.</span>
+          </div>
         </div>
 
         <div class="col-12">
-          <label for="description" class="form-label">Description</label>
-          <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
+          <label class="form-label">Catégories de places disponibles</label>
+          <div class="border rounded p-3" style="background-color: #f8f9fa;">
+            <div class="row row-cols-2 row-cols-md-4 g-2">
+              <div *ngFor="let type of availableTypesPlace" class="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" 
+                         [id]="'typePlace-' + type" 
+                         [checked]="isTypePlaceSelected(type)"
+                         (change)="onTypePlaceChange(type, $event)">
+                  <label class="form-check-label" [for]="'typePlace-' + type">
+                    {{ type }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Artistes participants</label>
+          <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background-color: #f8f9fa;">
+            <div *ngFor="let artiste of artistes" class="form-check">
+              <input class="form-check-input" type="checkbox" 
+                     [id]="'artiste-' + artiste.id" 
+                     [checked]="isArtisteSelected(artiste.id!)"
+                     (change)="onArtisteChange(artiste.id!, $event)">
+              <label class="form-check-label" [for]="'artiste-' + artiste.id">
+                {{ artiste.nom }} {{ artiste.prenom }}
+              </label>
+            </div>
+            <div *ngIf="artistes.length === 0" class="text-muted small">Aucun artiste disponible</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Organisateurs</label>
+          <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background-color: #f8f9fa;">
+            <div *ngFor="let org of organisateurs" class="form-check">
+              <input class="form-check-input" type="checkbox" 
+                     [id]="'org-' + org.id" 
+                     [checked]="isOrganisateurSelected(org.id!)"
+                     (change)="onOrganisateurChange(org.id!, $event)">
+              <label class="form-check-label" [for]="'org-' + org.id">
+                {{ org.nom }}
+              </label>
+            </div>
+            <div *ngIf="organisateurs.length === 0" class="text-muted small">Aucun organisateur disponible</div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+          <textarea id="description" class="form-control" rows="3" formControlName="description" [class.is-invalid]="form.get('description')?.touched && form.get('description')?.invalid"></textarea>
+          <div class="invalid-feedback" *ngIf="form.get('description')?.touched && form.get('description')?.invalid">Ce champ est obligatoire.</div>
         </div>
       </div>
     </div>

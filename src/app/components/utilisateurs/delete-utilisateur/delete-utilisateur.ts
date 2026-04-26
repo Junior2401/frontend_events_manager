@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilisateurApiService } from '../../../services/utilisateur-api.service';
@@ -8,36 +8,7 @@ import { Utilisateur } from '../../../models/utilisateur';
   selector: 'app-delete-utilisateur',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="card shadow-sm border-0 mb-4">
-      <div class="card-header bg-white border-bottom py-3">
-        <h5 class="card-title mb-0 fw-semibold">Confirmation de suppression</h5>
-      </div>
-
-      <div *ngIf="isLoading" class="card-body text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-      </div>
-
-      <div *ngIf="!isLoading && utilisateur" class="card-body text-center py-4">
-        <p class="fs-5">
-          Etes-vous sur de vouloir supprimer
-          <strong class="text-primary">{{ utilisateur.nom }} {{ utilisateur.prenom }}</strong> ?
-        </p>
-        <p class="text-muted">Cette action est irreversible.</p>
-      </div>
-
-      <div class="card-footer bg-white border-top">
-        <div class="row justify-content-center">
-          <div class="col-sm-4 mb-2">
-            <button class="btn btn-sm btn-secondary w-100" (click)="onBack()"><i class="bi bi-arrow-left-circle"></i> Retour</button>
-          </div>
-          <div class="col-sm-4">
-            <button class="btn btn-sm btn-danger w-100" (click)="onDelete()" [disabled]="isSubmitting"><i class="bi bi-trash-fill"></i> Supprimer</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './delete-utilisateur.html',
   styleUrl: './delete-utilisateur.css'
 })
 export class DeleteUtilisateur implements OnInit {
@@ -46,7 +17,12 @@ export class DeleteUtilisateur implements OnInit {
   isSubmitting = false;
   id!: number;
 
-  constructor(private route: ActivatedRoute, private router: Router, private utilisateurService: UtilisateurApiService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private utilisateurService: UtilisateurApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
@@ -54,10 +30,12 @@ export class DeleteUtilisateur implements OnInit {
       next: (data) => {
         this.utilisateur = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur API:', err);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -71,14 +49,28 @@ export class DeleteUtilisateur implements OnInit {
       return;
     }
     this.isSubmitting = true;
+    this.cdr.detectChanges();
     this.utilisateurService.deleteUtilisateur(this.id).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.router.navigate(['/utilisateurs']);
+        this.cdr.detectChanges();
+        this.router.navigate(['/utilisateurs'], {
+          queryParams: { message: 'Utilisateur supprimé avec succès', type: 'success' }
+        });
       },
       error: (error) => {
         console.error('Erreur lors de la suppression :', error);
         this.isSubmitting = false;
+        this.cdr.detectChanges();
+
+        let errorMsg = 'Impossible de supprimer cet utilisateur.';
+        if (error.error && (typeof error.error === 'string' || error.error.message)) {
+          errorMsg = typeof error.error === 'string' ? error.error : error.error.message;
+        }
+
+        this.router.navigate(['/utilisateurs'], {
+          queryParams: { message: errorMsg, type: 'danger' }
+        });
       }
     });
   }

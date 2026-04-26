@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, RouterLink } from '@angular/router';
+import { RouterModule, RouterLink, ActivatedRoute } from '@angular/router';
 import { ArtisteApiService } from '../../../services/artiste-api.service';
 import { Artiste } from '../../../models/artiste';
 
@@ -17,14 +17,17 @@ export class ListArtiste implements OnInit, AfterViewInit {
   dtOptions: any = {};
   artistes: Artiste[] = [];
   isLoading = true;
+  notification: { message: string, type: string } | null = null;
 
   constructor(
     private artisteService: ArtisteApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loadData();
+    this.checkNotifications();
 
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -80,5 +83,27 @@ export class ListArtiste implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  checkNotifications(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['message']) {
+        this.notification = {
+          message: params['message'],
+          type: params['type'] || 'info'
+        };
+        this.cdr.detectChanges();
+
+        // Auto-fermeture après 5 secondes
+        setTimeout(() => {
+          this.closeNotification();
+        }, 5000);
+      }
+    });
+  }
+
+  closeNotification(): void {
+    this.notification = null;
+    this.cdr.detectChanges();
   }
 }

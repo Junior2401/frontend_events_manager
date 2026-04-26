@@ -1,1 +1,93 @@
-<p>detail-utilisateur works!</p>
+<div class="card shadow-sm border-0 mb-4">
+
+  <!-- HEADER -->
+  <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+    <h5 class="card-title mb-0 fw-bold">
+      <i class="bi bi-person-fill text-primary me-2"></i>
+      Détail Utilisateur
+    </h5>
+
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()">
+      <i class="bi bi-arrow-left"></i> Retour
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div *ngIf="!isLoading && utilisateur" class="card-body px-4 py-4">
+
+    <!-- SECTION : Informations générales -->
+    <h6 class="text-uppercase text-muted fw-bold small mb-3">
+      <i class="bi bi-info-circle me-1"></i> Informations générales
+    </h6>
+
+    <div class="row g-3">
+
+      <!-- Nom -->
+      <div class="col-md-6">
+        <div class="p-3 border rounded bg-light">
+          <div class="text-muted small">
+            <i class="bi bi-person"></i> Nom
+          </div>
+          <div class="fw-semibold fs-6">{{ utilisateur.nom }}</div>
+        </div>
+      </div>
+
+      <!-- Prénom -->
+      <div class="col-md-6">
+        <div class="p-3 border rounded bg-light">
+          <div class="text-muted small">
+            <i class="bi bi-person"></i> Prénom
+          </div>
+          <div class="fw-semibold fs-6">{{ utilisateur.prenom }}</div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="col-md-6">
+        <div class="p-3 border rounded bg-light">
+          <div class="text-muted small">
+            <i class="bi bi-envelope"></i> Email
+          </div>
+          <div class="fw-semibold fs-6">{{ utilisateur.email }}</div>
+        </div>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="col-md-6">
+        <div class="p-3 border rounded bg-light">
+          <div class="text-muted small">
+            <i class="bi bi-telephone"></i> Téléphone
+          </div>
+          <div class="fw-semibold fs-6">{{ formatPhone(utilisateur.telephone) || '-' }}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
+
+    <button type="button"
+            class="btn btn-warning btn-sm"
+            [routerLink]="['/utilisateurs/edit', utilisateur?.id]"
+            [disabled]="!utilisateur?.id">
+      Modifier <i class="bi bi-pencil-square"></i>
+    </button>
+
+    <button type="button"
+            class="btn btn-danger btn-sm"
+            [routerLink]="['/utilisateurs/delete', utilisateur?.id]"
+            [disabled]="!utilisateur?.id">
+      Supprimer <i class="bi bi-trash-fill"></i>
+    </button>
+
+  </div>
+
+</div>
+
