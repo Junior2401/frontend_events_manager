@@ -22,7 +22,7 @@ export class CreateTicket implements OnInit {
     numeroPlace: ['', Validators.required],
     place: ['', Validators.required], // Sera le type de place sélectionné
     prix: [0, [Validators.required, Validators.min(0)]],
-    statut: ['ACHETE', Validators.required],
+    statut: [{ value: 'ACHETE', disabled: true }, Validators.required],
     evenementId: [0, [Validators.required, Validators.min(1)]],
     utilisateurId: [0, [Validators.required, Validators.min(1)]]
   });
@@ -33,6 +33,18 @@ export class CreateTicket implements OnInit {
   isSubmitting = false;
   isLoading = true;
   errorMessage: string | null = null;
+
+  // Prix par type de place
+  private readonly pricesMap: Record<string, number> = {
+    'VIP': 150,
+    'Premium': 100,
+    'Gold': 120,
+    'Silver': 80,
+    'Standard': 50,
+    'Loge': 200,
+    'Balcon': 75,
+    'Orchestre': 90
+  };
 
   constructor(
     private fb: FormBuilder, 
@@ -60,6 +72,15 @@ export class CreateTicket implements OnInit {
       this.selectedEventTypesPlace = ev?.typesPlace || [];
       this.cdr.detectChanges();
     });
+
+    // Mettre à jour le prix quand le type de place change
+    this.form.get('place')?.valueChanges.subscribe(placeType => {
+      if (placeType && this.pricesMap[placeType]) {
+        this.form.patchValue({ prix: this.pricesMap[placeType] });
+      } else {
+        this.form.patchValue({ prix: 0 });
+      }
+    });
   }
 
   onSubmit(): void {
@@ -69,7 +90,8 @@ export class CreateTicket implements OnInit {
       return;
     }
 
-    const payload = this.form.getRawValue() as unknown as Ticket;
+    // getRawValue permet de récupérer même les champs disabled (le statut)
+    const payload = this.form.getRawValue() as any;
     this.isSubmitting = true;
     this.cdr.detectChanges();
 

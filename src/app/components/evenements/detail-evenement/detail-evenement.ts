@@ -19,8 +19,8 @@ export class DetailEvenement implements OnInit {
   isLoading = true;
 
   constructor(
-    private route: ActivatedRoute, 
-    private router: Router, 
+    private route: ActivatedRoute,
+    private router: Router,
     private evenementService: EvenementApiService,
     private typeService: TypeEvenementApiService,
     private ticketService: TicketApiService,
@@ -58,6 +58,8 @@ export class DetailEvenement implements OnInit {
   private loadRelations(id: number): void {
     if (!this.evenement) return;
 
+    console.log('Loading relations for event:', id);
+
     // 1. Charger le type d'événement
     if (this.evenement.typeEvenementId) {
       this.typeService.getTypeEvenementById(this.evenement.typeEvenementId)
@@ -68,21 +70,31 @@ export class DetailEvenement implements OnInit {
         });
     }
 
-    // 2. Charger les artistes
-    this.evenementService.getArtistesByEvenement(id)
-      .pipe(catchError(() => of([])))
-      .subscribe(artistes => {
-        if (this.evenement) this.evenement.artistes = artistes || [];
-        this.cdr.detectChanges();
-      });
+    // 2. Charger les artistes (utiliser ceux de l'événement s'ils existent)
+    if (this.evenement.artistes && this.evenement.artistes.length > 0) {
+      console.log('Artists already in event:', this.evenement.artistes.length);
+    } else {
+      this.evenementService.getArtistesByEvenement(id)
+        .pipe(catchError(() => of([])))
+        .subscribe(artistes => {
+          if (this.evenement) this.evenement.artistes = artistes || [];
+          console.log('Loaded artists:', artistes.length);
+          this.cdr.detectChanges();
+        });
+    }
 
-    // 3. Charger les organisateurs
-    this.evenementService.getOrganisateursByEvenement(id)
-      .pipe(catchError(() => of([])))
-      .subscribe(orgs => {
-        if (this.evenement) this.evenement.organisateurs = orgs || [];
-        this.cdr.detectChanges();
-      });
+    // 3. Charger les organisateurs (utiliser ceux de l'événement s'ils existent)
+    if (this.evenement.organisateurs && this.evenement.organisateurs.length > 0) {
+      console.log('✅ Organizers already in event:', this.evenement.organisateurs.length);
+    } else {
+      this.evenementService.getOrganisateursByEvenement(id)
+        .pipe(catchError(() => of([])))
+        .subscribe(orgs => {
+          if (this.evenement) this.evenement.organisateurs = orgs || [];
+          console.log('📥 Loaded organizers:', orgs.length);
+          this.cdr.detectChanges();
+        });
+    }
 
     // 4. Charger et calculer les statistiques des tickets
     this.ticketService.getTicketsByEvenement(id)

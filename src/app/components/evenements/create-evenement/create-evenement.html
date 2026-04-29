@@ -57,8 +57,8 @@
             <div class="row row-cols-2 row-cols-md-4 g-2">
               <div *ngFor="let type of availableTypesPlace" class="col">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" 
-                         [id]="'typePlace-' + type" 
+                  <input class="form-check-input" type="checkbox"
+                         [id]="'typePlace-' + type"
                          [checked]="isTypePlaceSelected(type)"
                          (change)="onTypePlaceChange(type, $event)">
                   <label class="form-check-label" [for]="'typePlace-' + type">
@@ -74,8 +74,9 @@
           <label class="form-label">Artistes participants</label>
           <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background-color: #f8f9fa;">
             <div *ngFor="let artiste of artistes" class="form-check">
-              <input class="form-check-input" type="checkbox" 
-                     [id]="'artiste-' + artiste.id" 
+              <input class="form-check-input" type="checkbox"
+                     [id]="'artiste-' + artiste.id"
+                     [value]="artiste.id"
                      [checked]="isArtisteSelected(artiste.id!)"
                      (change)="onArtisteChange(artiste.id!, $event)">
               <label class="form-check-label" [for]="'artiste-' + artiste.id">
@@ -90,8 +91,9 @@
           <label class="form-label">Organisateurs</label>
           <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background-color: #f8f9fa;">
             <div *ngFor="let org of organisateurs" class="form-check">
-              <input class="form-check-input" type="checkbox" 
-                     [id]="'org-' + org.id" 
+              <input class="form-check-input" type="checkbox"
+                     [id]="'org-' + org.id"
+                     [value]="org.id"
                      [checked]="isOrganisateurSelected(org.id!)"
                      (change)="onOrganisateurChange(org.id!, $event)">
               <label class="form-check-label" [for]="'org-' + org.id">

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Evenement } from '../models/evenement';
 import { TypeEvenement } from '../models/type-evenement';
 import { Artiste } from '../models/artiste';
@@ -25,11 +26,21 @@ export class EvenementApiService {
   }
 
   getArtistesByEvenement(id: number): Observable<Artiste[]> {
-    return this.http.get<Artiste[]>(`${this.apiUrl}/${id}/artistes`);
+    return this.http.get<Artiste[]>(`${this.apiUrl}/${id}/artistes`).pipe(
+      catchError(err => {
+        console.warn(`Endpoint GET /evenements/${id}/artistes not found (404), will rely on event.artistes property`);
+        return of([]);
+      })
+    );
   }
 
   getOrganisateursByEvenement(id: number): Observable<Organisateur[]> {
-    return this.http.get<Organisateur[]>(`${this.apiUrl}/${id}/organisateurs`);
+    return this.http.get<Organisateur[]>(`${this.apiUrl}/${id}/organisateurs`).pipe(
+      catchError(err => {
+        console.warn(`Endpoint GET /evenements/${id}/organisateurs not found (404), will rely on event.organisateurs property`);
+        return of([]);
+      })
+    );
   }
 
   createEvenement(payload: Evenement): Observable<Evenement> {

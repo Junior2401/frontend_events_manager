@@ -25,7 +25,7 @@ export class AchatTicket implements OnInit {
     prenom: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     telephone: ['', Validators.required],
-    
+
     place: ['', Validators.required],
     prix: [0, [Validators.required, Validators.min(1)]],
     numeroPlace: ['', Validators.required],
@@ -63,12 +63,12 @@ export class AchatTicket implements OnInit {
 
   ngOnInit(): void {
     const eventIdParam = this.route.snapshot.params['eventId'];
-    
+
     this.evenementService.getEvenements().pipe(
       catchError(() => of([]))
     ).subscribe((evenements) => {
       this.evenements = evenements;
-      
+
       if (eventIdParam) {
         const id = Number(eventIdParam);
         this.form.patchValue({ evenementId: id });
@@ -138,7 +138,7 @@ export class AchatTicket implements OnInit {
         this.form.reset({ statut: 'ACHETE' });
         this.selectedEvenement = null;
         this.cdr.detectChanges();
-        
+
         setTimeout(() => {
           this.router.navigate(['/accueil']);
         }, 5000);

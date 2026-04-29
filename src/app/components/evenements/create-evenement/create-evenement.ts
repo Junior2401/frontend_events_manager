@@ -87,7 +87,7 @@ export class CreateEvenement implements OnInit {
 
   onArtisteChange(id: number, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    const currentIds = this.form.value.artistesIds || [];
+    const currentIds = (this.form.value.artistesIds || []).filter((val: any) => val != null && val > 0);
     if (checkbox.checked) {
       this.form.patchValue({ artistesIds: [...currentIds, id] });
     } else {
@@ -96,12 +96,13 @@ export class CreateEvenement implements OnInit {
   }
 
   isArtisteSelected(id: number): boolean {
-    return (this.form.value.artistesIds || []).includes(id);
+    const artistesIds = (this.form.value.artistesIds || []).filter((val: any) => val != null && val > 0);
+    return artistesIds.includes(id);
   }
 
   onOrganisateurChange(id: number, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    const currentIds = this.form.value.organisateursIds || [];
+    const currentIds = (this.form.value.organisateursIds || []).filter((val: any) => val != null && val > 0);
     if (checkbox.checked) {
       this.form.patchValue({ organisateursIds: [...currentIds, id] });
     } else {
@@ -110,7 +111,8 @@ export class CreateEvenement implements OnInit {
   }
 
   isOrganisateurSelected(id: number): boolean {
-    return (this.form.value.organisateursIds || []).includes(id);
+    const organisateursIds = (this.form.value.organisateursIds || []).filter((val: any) => val != null && val > 0);
+    return organisateursIds.includes(id);
   }
 
   onSubmit(): void {
@@ -121,58 +123,77 @@ export class CreateEvenement implements OnInit {
 
     const val = this.form.value;
 
+    const dateVal = val.date ? String(val.date).substring(0, 19) : null;
+
     const payload: any = {
       libelle: val.libelle,
       lieu: val.lieu,
-      date: val.date,
+      date: dateVal,
       capacite: Number(val.capacite),
       description: val.description,
       statut: val.statut,
       typeEvenementId: Number(val.typeEvenementId),
-      typesPlace: val.typesPlace || [],
-      artistesIds: val.artistesIds || [],
-      organisateursIds: val.organisateursIds || []
+      typesPlace: val.typesPlace || []
     };
 
     this.isSubmitting = true;
     this.cdr.detectChanges();
 
+    console.log('Creating event with payload:', payload);
+    console.log('Form values - artistesIds:', val.artistesIds, 'organisateursIds:', val.organisateursIds);
+
     this.evenementService.createEvenement(payload).subscribe({
       next: (createdEvenement) => {
+        console.log('Event created with ID:', createdEvenement.id);
+
         // Ajouter les artistes et organisateurs sélectionnés
-        const artistesIds = val.artistesIds || [];
-        const organisateursIds = val.organisateursIds || [];
+        const artistesIds = (val.artistesIds || []).filter((id: any) => id != null && id !== '');
+        const organisateursIds = (val.organisateursIds || []).filter((id: any) => id != null && id !== '');
+
+        console.log('Filtered artists:', artistesIds);
+        console.log('Filtered organizers:', organisateursIds);
 
         const relationsTasks: Observable<any>[] = [];
 
-        artistesIds.forEach((id: number) => {
-          relationsTasks.push(
-            this.evenementService.addArtisteToEvenement(createdEvenement.id!, id)
-              .pipe(catchError(err => {
-                console.error(`Erreur ajout artiste ${id}:`, err);
-                return of(null);
-              }))
-          );
+        artistesIds.forEach((id: any) => {
+          const artisteId = Number(id);
+          if (!isNaN(artisteId) && artisteId > 0) {
+            console.log('Adding artist:', artisteId);
+            relationsTasks.push(
+              this.evenementService.addArtisteToEvenement(createdEvenement.id!, artisteId)
+                .pipe(catchError(err => {
+                  console.error(`Erreur ajout artiste ${artisteId}:`, err);
+                  return of(null);
+                }))
+            );
+          }
         });
 
-        organisateursIds.forEach((id: number) => {
-          relationsTasks.push(
-            this.evenementService.addOrganisateurToEvenement(createdEvenement.id!, id)
-              .pipe(catchError(err => {
-                console.error(`Erreur ajout organisateur ${id}:`, err);
-                return of(null);
-              }))
-          );
+        organisateursIds.forEach((id: any) => {
+          const orgId = Number(id);
+          if (!isNaN(orgId) && orgId > 0) {
+            console.log('Adding organizer:', orgId);
+            relationsTasks.push(
+              this.evenementService.addOrganisateurToEvenement(createdEvenement.id!, orgId)
+                .pipe(catchError(err => {
+                  console.error(`Erreur ajout organisateur ${orgId}:`, err);
+                  return of(null);
+                }))
+            );
+          }
         });
+
+        console.log('Relations tasks to execute:', relationsTasks.length);
 
         if (relationsTasks.length > 0) {
           forkJoin(relationsTasks).subscribe({
             next: () => {
-              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé avec succès', type: 'success' } });
+              console.log('All relations added successfully');
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé avec artistes et organisateurs', type: 'success' } });
             },
-            error: () => {
-              // Même si les relations échouent, naviguer (elles peuvent être ajoutées manuellement)
-              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé (certaines relations non ajoutées)', type: 'warning' } });
+            error: (err) => {
+              console.error('Error adding relations:', err);
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé mais erreur lors de l\'ajout des relations', type: 'warning' } });
             }
           });
         } else {

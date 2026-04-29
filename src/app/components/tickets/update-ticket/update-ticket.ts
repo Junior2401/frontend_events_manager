@@ -21,7 +21,7 @@ export class UpdateTicket implements OnInit {
   readonly form = this.fb.nonNullable.group({
     numeroPlace: ['', Validators.required],
     place: ['', Validators.required],
-    prix: [0, Validators.required],
+    prix: [{ value: 0, disabled: true }, Validators.required],
     statut: ['', Validators.required],
     evenementId: [0, [Validators.required, Validators.min(1)]],
     utilisateurId: [0, [Validators.required, Validators.min(1)]]
@@ -38,6 +38,18 @@ export class UpdateTicket implements OnInit {
     { value: 'ANNULE', label: 'Annulé' },
     { value: 'REMBOURSE', label: 'Remboursé' }
   ];
+
+  // Prix par type de place
+  private readonly pricesMap: Record<string, number> = {
+    'VIP': 150,
+    'Premium': 100,
+    'Gold': 120,
+    'Silver': 80,
+    'Standard': 50,
+    'Loge': 200,
+    'Balcon': 75,
+    'Orchestre': 90
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -58,6 +70,15 @@ export class UpdateTicket implements OnInit {
       const ev = this.evenements.find(e => e.id === Number(id));
       this.selectedEventTypesPlace = ev?.typesPlace || [];
       this.cdr.detectChanges();
+    });
+
+    // Mettre à jour le prix quand le type de place change
+    this.form.get('place')?.valueChanges.subscribe(placeType => {
+      if (placeType && this.pricesMap[placeType]) {
+        this.form.patchValue({ prix: this.pricesMap[placeType] });
+      } else {
+        this.form.patchValue({ prix: 0 });
+      }
     });
   }
 

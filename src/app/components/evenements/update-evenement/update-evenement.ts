@@ -61,11 +61,20 @@ export class UpdateEvenement implements OnInit {
       types: this.typeEvenementService.getTypeEvenements().pipe(catchError(() => of([]))),
       artistes: this.artisteService.getArtistes().pipe(catchError(() => of([]))),
       organisateurs: this.organisateurService.getOrganisateurs().pipe(catchError(() => of([]))),
-      evenement: this.evenementService.getEvenementById(this.id),
+      evenement: this.evenementService.getEvenementById(this.id).pipe(catchError(err => {
+        console.error('Erreur lors du chargement de l\'événement:', err);
+        return of(null);
+      })),
       evenementArtistes: this.evenementService.getArtistesByEvenement(this.id).pipe(catchError(() => of([]))),
       evenementOrganisateurs: this.evenementService.getOrganisateursByEvenement(this.id).pipe(catchError(() => of([])))
     }).subscribe({
       next: ({ types, artistes, organisateurs, evenement, evenementArtistes, evenementOrganisateurs }) => {
+        if (!evenement) {
+          console.error('Événement non trouvé');
+          this.router.navigate(['/evenements']);
+          return;
+        }
+
         this.typeEvenements = types;
         this.artistes = artistes;
         this.organisateurs = organisateurs;
@@ -79,6 +88,8 @@ export class UpdateEvenement implements OnInit {
 
         const artistesIds = (evenementArtistes || []).map(a => a.id!);
         const organisateursIds = (evenementOrganisateurs || []).map(o => o.id!);
+
+        console.log('Loaded relations for update:', { artists: artistesIds, organizers: organisateursIds });
 
         this.previousArtistesIds = [...artistesIds];
         this.previousOrganisateursIds = [...organisateursIds];
@@ -123,7 +134,7 @@ export class UpdateEvenement implements OnInit {
 
   onArtisteChange(id: number, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    const currentIds = this.form.value.artistesIds || [];
+    const currentIds = (this.form.value.artistesIds || []).filter((val: any) => val != null && val > 0);
     if (checkbox.checked) {
       this.form.patchValue({ artistesIds: [...currentIds, id] });
     } else {
@@ -132,12 +143,13 @@ export class UpdateEvenement implements OnInit {
   }
 
   isArtisteSelected(id: number): boolean {
-    return (this.form.value.artistesIds || []).includes(id);
+    const artistesIds = (this.form.value.artistesIds || []).filter((val: any) => val != null && val > 0);
+    return artistesIds.includes(id);
   }
 
   onOrganisateurChange(id: number, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    const currentIds = this.form.value.organisateursIds || [];
+    const currentIds = (this.form.value.organisateursIds || []).filter((val: any) => val != null && val > 0);
     if (checkbox.checked) {
       this.form.patchValue({ organisateursIds: [...currentIds, id] });
     } else {
@@ -146,7 +158,8 @@ export class UpdateEvenement implements OnInit {
   }
 
   isOrganisateurSelected(id: number): boolean {
-    return (this.form.value.organisateursIds || []).includes(id);
+    const organisateursIds = (this.form.value.organisateursIds || []).filter((val: any) => val != null && val > 0);
+    return organisateursIds.includes(id);
   }
 
   onSubmit(): void {
@@ -156,39 +169,47 @@ export class UpdateEvenement implements OnInit {
     }
 
     const val = this.form.value;
+    const dateVal = val.date ? String(val.date).substring(0, 19) : null;
 
     const payload: any = {
       id: this.id,
       libelle: val.libelle,
       lieu: val.lieu,
-      date: val.date,
+      date: dateVal,
       capacite: Number(val.capacite),
       description: val.description,
       statut: val.statut,
       typeEvenementId: Number(val.typeEvenementId),
-      typesPlace: val.typesPlace || [],
-      artistesIds: val.artistesIds || [],
-      organisateursIds: val.organisateursIds || []
+      typesPlace: val.typesPlace || []
     };
 
     this.isSubmitting = true;
     this.cdr.detectChanges();
 
+    console.log('Updating event:', payload.libelle);
+
     this.evenementService.updateEvenement(this.id, payload).subscribe({
       next: () => {
+        console.log('Event updated successfully');
+
         // Gérer les changements des relations
-        const currentArtistesIds = val.artistesIds || [];
-        const currentOrganisateursIds = val.organisateursIds || [];
+        const currentArtistesIds = (val.artistesIds || []).filter((id: any) => id != null && id > 0);
+        const currentOrganisateursIds = (val.organisateursIds || []).filter((id: any) => id != null && id > 0);
+
+        console.log('Relations change summary:');
+        console.log('  Artists: from', this.previousArtistesIds, '→', currentArtistesIds);
+        console.log('  Organizers: from', this.previousOrganisateursIds, '→', currentOrganisateursIds);
 
         const relationsTasks: Observable<any>[] = [];
 
         // Artistes à supprimer
         this.previousArtistesIds.forEach(id => {
           if (!currentArtistesIds.includes(id)) {
+            console.log('🗑Removing artist:', id);
             relationsTasks.push(
               this.evenementService.removeArtisteFromEvenement(this.id, id)
                 .pipe(catchError(err => {
-                  console.error(`Erreur suppression artiste ${id}:`, err);
+                  console.error(`Error removing artist ${id}:`, err);
                   return of(null);
                 }))
             );
@@ -198,10 +219,11 @@ export class UpdateEvenement implements OnInit {
         // Artistes à ajouter
         currentArtistesIds.forEach((id: number) => {
           if (!this.previousArtistesIds.includes(id)) {
+            console.log('Adding artist:', id);
             relationsTasks.push(
               this.evenementService.addArtisteToEvenement(this.id, id)
                 .pipe(catchError(err => {
-                  console.error(`Erreur ajout artiste ${id}:`, err);
+                  console.error(`Error adding artist ${id}:`, err);
                   return of(null);
                 }))
             );
@@ -211,10 +233,11 @@ export class UpdateEvenement implements OnInit {
         // Organisateurs à supprimer
         this.previousOrganisateursIds.forEach(id => {
           if (!currentOrganisateursIds.includes(id)) {
+            console.log('🗑Removing organizer:', id);
             relationsTasks.push(
               this.evenementService.removeOrganisateurFromEvenement(this.id, id)
                 .pipe(catchError(err => {
-                  console.error(`Erreur suppression organisateur ${id}:`, err);
+                  console.error(`Error removing organizer ${id}:`, err);
                   return of(null);
                 }))
             );
@@ -224,34 +247,40 @@ export class UpdateEvenement implements OnInit {
         // Organisateurs à ajouter
         currentOrganisateursIds.forEach((id: number) => {
           if (!this.previousOrganisateursIds.includes(id)) {
+            console.log('Adding organizer:', id);
             relationsTasks.push(
               this.evenementService.addOrganisateurToEvenement(this.id, id)
                 .pipe(catchError(err => {
-                  console.error(`Erreur ajout organisateur ${id}:`, err);
+                  console.error(`Error adding organizer ${id}:`, err);
                   return of(null);
                 }))
             );
           }
         });
 
+        console.log(`Processing ${relationsTasks.length} relation changes...`);
+
         if (relationsTasks.length > 0) {
           forkJoin(relationsTasks).subscribe({
             next: () => {
-              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour avec succès', type: 'success' } });
+              console.log('All relations updated successfully!');
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mi à jour avec succès', type: 'success' } });
             },
-            error: () => {
-              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour (certaines relations non mises à jour)', type: 'warning' } });
+            error: (err) => {
+              console.error('Error updating relations:', err);
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour (certaines relations en erreur)', type: 'warning' } });
             }
           });
         } else {
+          console.log('ℹNo relation changes to apply');
           this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour avec succès', type: 'success' } });
         }
       },
       error: (err) => {
-        console.error('Erreur lors de la mise à jour :', err);
+        console.error('Error updating event:', err);
         this.isSubmitting = false;
         this.cdr.detectChanges();
-        alert('Erreur lors de la mise à jour (400 Bad Request probable).');
+        alert('Erreur lors de la mise à jour de l\'événement');
       }
     });
   }
