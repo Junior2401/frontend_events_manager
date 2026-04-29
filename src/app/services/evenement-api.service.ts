@@ -43,4 +43,22 @@ export class EvenementApiService {
   deleteEvenement(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  // Gestion des artistes
+  addArtisteToEvenement(evenementId: number, artisteId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${evenementId}/artistes/${artisteId}`, {});
+  }
+
+  removeArtisteFromEvenement(evenementId: number, artisteId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${evenementId}/artistes/${artisteId}`);
+  }
+
+  // Gestion des organisateurs
+  addOrganisateurToEvenement(evenementId: number, organisateurId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${evenementId}/organisateurs/${organisateurId}`, {});
+  }
+
+  removeOrganisateurFromEvenement(evenementId: number, organisateurId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${evenementId}/organisateurs/${organisateurId}`);
+  }
 }

@@ -1,0 +1,49 @@
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.form-select-lg {
+    font-size: 1.1rem;
+    padding: 0.75rem 1rem;
+    border-width: 2px;
+}
+
+.form-select-lg:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.btn-primary {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate__animated {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+.animate__fadeIn {
+    animation-name: fadeIn;
+}
+
+@keyframes shakeX {
+    from, to { transform: translate3d(0, 0, 0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate3d(-10px, 0, 0); }
+    20%, 40%, 60%, 80% { transform: translate3d(10px, 0, 0); }
+}
+
+.animate__shakeX {
+    animation-name: shakeX;
+}

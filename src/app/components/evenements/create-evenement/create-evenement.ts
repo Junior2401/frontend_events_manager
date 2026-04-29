@@ -10,7 +10,7 @@ import { ArtisteApiService } from '../../../services/artiste-api.service';
 import { OrganisateurApiService } from '../../../services/organisateur-api.service';
 import { Artiste } from '../../../models/artiste';
 import { Organisateur } from '../../../models/organisateur';
-import { forkJoin, of, catchError } from 'rxjs';
+import { forkJoin, of, catchError, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-create-evenement',
@@ -41,8 +41,8 @@ export class CreateEvenement implements OnInit {
   readonly availableTypesPlace = ["VIP", "Standard", "Premium", "Gold", "Silver", "Loge", "Balcon", "Orchestre"];
 
   constructor(
-    private fb: FormBuilder, 
-    private router: Router, 
+    private fb: FormBuilder,
+    private router: Router,
     private evenementService: EvenementApiService,
     private typeEvenementService: TypeEvenementApiService,
     private artisteService: ArtisteApiService,
@@ -120,8 +120,7 @@ export class CreateEvenement implements OnInit {
     }
 
     const val = this.form.value;
-    
-    // Payload STRICTEMENT identique à l'exemple de succès de l'API
+
     const payload: any = {
       libelle: val.libelle,
       lieu: val.lieu,
@@ -130,25 +129,61 @@ export class CreateEvenement implements OnInit {
       description: val.description,
       statut: val.statut,
       typeEvenementId: Number(val.typeEvenementId),
-      typesPlace: val.typesPlace || []
+      typesPlace: val.typesPlace || [],
+      artistesIds: val.artistesIds || [],
+      organisateursIds: val.organisateursIds || []
     };
 
-    // Note : On ne peut pas envoyer 'artistes' ou 'participer' car le DTO EvenementDTO ne les contient pas
-
-    // On ne met PAS artistesIds ou organisateursIds car le serveur les rejette
-    
     this.isSubmitting = true;
     this.cdr.detectChanges();
 
     this.evenementService.createEvenement(payload).subscribe({
-      next: () => {
-        this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé avec succès', type: 'success' } });
+      next: (createdEvenement) => {
+        // Ajouter les artistes et organisateurs sélectionnés
+        const artistesIds = val.artistesIds || [];
+        const organisateursIds = val.organisateursIds || [];
+
+        const relationsTasks: Observable<any>[] = [];
+
+        artistesIds.forEach((id: number) => {
+          relationsTasks.push(
+            this.evenementService.addArtisteToEvenement(createdEvenement.id!, id)
+              .pipe(catchError(err => {
+                console.error(`Erreur ajout artiste ${id}:`, err);
+                return of(null);
+              }))
+          );
+        });
+
+        organisateursIds.forEach((id: number) => {
+          relationsTasks.push(
+            this.evenementService.addOrganisateurToEvenement(createdEvenement.id!, id)
+              .pipe(catchError(err => {
+                console.error(`Erreur ajout organisateur ${id}:`, err);
+                return of(null);
+              }))
+          );
+        });
+
+        if (relationsTasks.length > 0) {
+          forkJoin(relationsTasks).subscribe({
+            next: () => {
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé avec succès', type: 'success' } });
+            },
+            error: () => {
+              // Même si les relations échouent, naviguer (elles peuvent être ajoutées manuellement)
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé (certaines relations non ajoutées)', type: 'warning' } });
+            }
+          });
+        } else {
+          this.router.navigate(['/evenements'], { queryParams: { message: 'Événement créé avec succès', type: 'success' } });
+        }
       },
       error: (err) => {
         console.error('Erreur lors de la création :', err);
         this.isSubmitting = false;
         this.cdr.detectChanges();
-        
+
         let msg = "Erreur lors de l'enregistrement.";
         if (err.status === 400) msg = "Données invalides (400 Bad Request). Vérifiez les champs.";
         alert(msg);
@@ -160,3 +195,5 @@ export class CreateEvenement implements OnInit {
     this.router.navigate(['/evenements']);
   }
 }
+
+

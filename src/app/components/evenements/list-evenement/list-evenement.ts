@@ -2,8 +2,10 @@ import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, ActivatedRoute } from '@angular/router';
 import { EvenementApiService } from '../../../services/evenement-api.service';
+import { TypeEvenementApiService } from '../../../services/type-evenement-api.service';
 import { TicketApiService } from '../../../services/ticket-api.service';
 import { Evenement } from '../../../models/evenement';
+import { TypeEvenement } from '../../../models/type-evenement';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -19,11 +21,13 @@ declare var $: any;
 export class ListEvenement implements OnInit, AfterViewInit {
   dtOptions: any = {};
   evenements: Evenement[] = [];
+  typeEvenementMap: Map<number, TypeEvenement> = new Map();
   isLoading = true;
   notification: { message: string, type: string } | null = null;
 
   constructor(
     private evenementService: EvenementApiService,
+    private typeEvenementService: TypeEvenementApiService,
     private ticketService: TicketApiService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute
@@ -50,16 +54,28 @@ export class ListEvenement implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    // On charge les événements
-    this.evenementService.getEvenements().subscribe({
-      next: (data) => {
-        this.evenements = data ?? [];
-        
-        // Pour éviter de saturer le réseau, on ne charge les compteurs que si la liste n'est pas trop longue
-        // ou on pourrait imaginer un endpoint de stats global.
-        // Ici, on va charger les tickets pour chaque événement mais de manière plus ordonnée.
+    // On charge les événements et les types
+    forkJoin({
+      evenements: this.evenementService.getEvenements(),
+      types: this.typeEvenementService.getTypeEvenements().pipe(catchError(() => of([])))
+    }).subscribe({
+      next: ({ evenements, types }) => {
+        this.evenements = evenements ?? [];
+
+        // Créer une map des types d'événements par ID
+        types.forEach(type => {
+          this.typeEvenementMap.set(type.id!, type);
+        });
+
+        // Assigner les types aux événements
+        this.evenements.forEach(ev => {
+          if (ev.typeEvenementId && this.typeEvenementMap.has(ev.typeEvenementId)) {
+            ev.typeEvenement = this.typeEvenementMap.get(ev.typeEvenementId);
+          }
+        });
+
         this.loadTicketStats();
-        
+
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -74,7 +90,7 @@ export class ListEvenement implements OnInit, AfterViewInit {
 
   private loadTicketStats(): void {
     // On utilise forkJoin pour charger toutes les stats en parallèle proprement
-    const requests = this.evenements.map(ev => 
+    const requests = this.evenements.map(ev =>
       this.ticketService.getTicketsByEvenement(ev.id!).pipe(
         catchError(() => of([]))
       )

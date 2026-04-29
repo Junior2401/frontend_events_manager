@@ -138,6 +138,9 @@
   </div>
 
   <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
+    <button type="button" class="btn btn-success btn-sm text-white" [routerLink]="['/tickets/achat', evenement?.id]" [disabled]="!evenement?.id || fillPercentage >= 100">
+      <i class="bi bi-cart-plus"></i> Réserver une place
+    </button>
     <button type="button" class="btn btn-primary btn-sm" [routerLink]="['/evenements/edit', evenement?.id]" [disabled]="!evenement?.id">
       <i class="bi bi-pencil-square"></i> Modifier
     </button>

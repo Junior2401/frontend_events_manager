@@ -32,41 +32,52 @@
 
     <div *ngIf="!isLoading" class="table-responsive p-4">
       <table id="example1" class="table table-hover table-striped align-middle border-top">
-        <thead class="bg-light">
-        <tr>
-          <th class="border-bottom-0 py-3">#</th>
-          <th class="border-bottom-0 py-3">Libellé</th>
-          <th class="border-bottom-0 py-3">Lieu</th>
-          <th class="border-bottom-0 py-3">Date</th>
-          <th class="border-bottom-0 py-3">Capacité</th>
-          <th class="border-bottom-0 py-3">Remplissage</th>
-          <th class="border-bottom-0 py-3">Statut</th>
-          <th class="border-bottom-0 py-3 text-end px-4" style="width: 150px;">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let item of evenements; let i = index">
-          <td class="fw-semibold text-muted">{{ i + 1 }}</td>
-          <td class="fw-semibold">{{ item?.libelle }}</td>
-          <td class="fw-semibold text-muted small">{{ item?.lieu }}</td>
-          <td class="fw-semibold small">{{ formatDate(item?.date) }}</td>
-          <td class="fw-semibold">{{ item?.capacite }}</td>
-          <td>
-            <div class="d-flex align-items-center">
-              <div class="progress flex-grow-1 me-2" style="height: 6px; min-width: 50px;">
-                <div [class]="'progress-bar ' + (getFillPercentage(item) > 90 ? 'bg-danger' : (getFillPercentage(item) > 70 ? 'bg-warning' : 'bg-success'))" 
-                     [style.width.%]="getFillPercentage(item)"></div>
-              </div>
-              <span class="small fw-bold" [class.text-danger]="getFillPercentage(item) >= 100">
-                {{ getFillPercentage(item) }}%
-              </span>
-            </div>
-          </td>
-          <td class="fw-semibold">
-            <span [class]="'badge ' + getStatusBadgeClass(item?.statut)">{{ getStatusLabel(item?.statut) }}</span>
-          </td>
+         <thead class="bg-light">
+         <tr>
+           <th class="border-bottom-0 py-3">#</th>
+           <th class="border-bottom-0 py-3">Libellé</th>
+           <th class="border-bottom-0 py-3">Type</th>
+           <th class="border-bottom-0 py-3">Lieu</th>
+           <th class="border-bottom-0 py-3">Date</th>
+           <th class="border-bottom-0 py-3">Capacité</th>
+           <th class="border-bottom-0 py-3">Remplissage</th>
+           <th class="border-bottom-0 py-3">Statut</th>
+           <th class="border-bottom-0 py-3 text-end px-4" style="width: 150px;">Actions</th>
+         </tr>
+         </thead>
+         <tbody>
+         <tr *ngFor="let item of evenements; let i = index">
+           <td class="fw-semibold text-muted">{{ i + 1 }}</td>
+           <td class="fw-semibold">{{ item?.libelle }}</td>
+           <td>
+             <span class="badge bg-info text-dark" *ngIf="item?.typeEvenement">
+               {{ item?.typeEvenement?.libelle }}
+             </span>
+             <span class="badge bg-secondary text-muted small" *ngIf="!item?.typeEvenement">-</span>
+           </td>
+           <td class="fw-semibold text-muted small">{{ item?.lieu }}</td>
+           <td class="fw-semibold small">{{ formatDate(item?.date) }}</td>
+           <td class="fw-semibold">{{ item?.capacite }}</td>
+           <td>
+             <div class="d-flex align-items-center">
+               <div class="progress flex-grow-1 me-2" style="height: 6px; min-width: 50px;">
+                 <div [class]="'progress-bar ' + (getFillPercentage(item) > 90 ? 'bg-danger' : (getFillPercentage(item) > 70 ? 'bg-warning' : 'bg-success'))"
+                      [style.width.%]="getFillPercentage(item)"></div>
+               </div>
+               <span class="small fw-bold" [class.text-danger]="getFillPercentage(item) >= 100">
+                 {{ getFillPercentage(item) }}%
+               </span>
+             </div>
+           </td>
+           <td class="fw-semibold">
+             <span [class]="'badge ' + getStatusBadgeClass(item?.statut)">{{ getStatusLabel(item?.statut) }}</span>
+           </td>
           <td class="text-end px-4">
             <div class="btn-group shadow-sm">
+              <button class="btn btn-sm btn-success border-end text-white" title="Réserver un ticket"
+                      [routerLink]="['/tickets/achat', item.id]" [disabled]="!item.id || getFillPercentage(item) >= 100">
+                <i class="bi bi-cart-plus"></i>
+              </button>
               <button class="btn btn-sm btn-light border-end text-info" title="Detail"
                       [routerLink]="['/evenements/detail', item.id]" [disabled]="!item.id">
                 <i class="bi bi-eye"></i>
@@ -83,12 +94,12 @@
           </td>
         </tr>
 
-        <tr *ngIf="evenements.length === 0">
-          <td colspan="8" class="text-center text-muted py-5">
-            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-            Aucune donnée disponible.
-          </td>
-        </tr>
+         <tr *ngIf="evenements.length === 0">
+           <td colspan="9" class="text-center text-muted py-5">
+             <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+             Aucune donnée disponible.
+           </td>
+         </tr>
         </tbody>
       </table>
     </div>

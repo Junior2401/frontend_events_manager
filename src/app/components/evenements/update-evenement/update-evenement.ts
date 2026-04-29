@@ -10,7 +10,7 @@ import { ArtisteApiService } from '../../../services/artiste-api.service';
 import { OrganisateurApiService } from '../../../services/organisateur-api.service';
 import { Artiste } from '../../../models/artiste';
 import { Organisateur } from '../../../models/organisateur';
-import { forkJoin, of, catchError } from 'rxjs';
+import { forkJoin, of, catchError, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-update-evenement',
@@ -39,6 +39,8 @@ export class UpdateEvenement implements OnInit {
   typeEvenements: TypeEvenement[] = [];
   artistes: Artiste[] = [];
   organisateurs: Organisateur[] = [];
+  previousArtistesIds: number[] = [];
+  previousOrganisateursIds: number[] = [];
   readonly availableTypesPlace = ["VIP", "Standard", "Premium", "Gold", "Silver", "Loge", "Balcon", "Orchestre"];
 
   constructor(
@@ -54,24 +56,32 @@ export class UpdateEvenement implements OnInit {
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    
+
     forkJoin({
       types: this.typeEvenementService.getTypeEvenements().pipe(catchError(() => of([]))),
       artistes: this.artisteService.getArtistes().pipe(catchError(() => of([]))),
       organisateurs: this.organisateurService.getOrganisateurs().pipe(catchError(() => of([]))),
-      evenement: this.evenementService.getEvenementById(this.id)
+      evenement: this.evenementService.getEvenementById(this.id),
+      evenementArtistes: this.evenementService.getArtistesByEvenement(this.id).pipe(catchError(() => of([]))),
+      evenementOrganisateurs: this.evenementService.getOrganisateursByEvenement(this.id).pipe(catchError(() => of([])))
     }).subscribe({
-      next: ({ types, artistes, organisateurs, evenement }) => {
+      next: ({ types, artistes, organisateurs, evenement, evenementArtistes, evenementOrganisateurs }) => {
         this.typeEvenements = types;
         this.artistes = artistes;
         this.organisateurs = organisateurs;
-        
+
         let formattedDate = '';
         if (Array.isArray(evenement.date)) {
           formattedDate = `${evenement.date[0]}-${String(evenement.date[1]).padStart(2, '0')}-${String(evenement.date[2]).padStart(2, '0')}T${String(evenement.date[3] ?? 0).padStart(2, '0')}:${String(evenement.date[4] ?? 0).padStart(2, '0')}`;
         } else if (evenement.date) {
           formattedDate = String(evenement.date).substring(0, 16);
         }
+
+        const artistesIds = (evenementArtistes || []).map(a => a.id!);
+        const organisateursIds = (evenementOrganisateurs || []).map(o => o.id!);
+
+        this.previousArtistesIds = [...artistesIds];
+        this.previousOrganisateursIds = [...organisateursIds];
 
         this.form.patchValue({
           libelle: evenement.libelle,
@@ -82,8 +92,8 @@ export class UpdateEvenement implements OnInit {
           statut: evenement.statut,
           typeEvenementId: evenement.typeEvenementId,
           typesPlace: evenement.typesPlace || [],
-          artistesIds: evenement.artistes ? evenement.artistes.map(a => a.id!) : [],
-          organisateursIds: evenement.organisateurs ? evenement.organisateurs.map(o => o.id!) : []
+          artistesIds: artistesIds,
+          organisateursIds: organisateursIds
         });
 
         this.isLoading = false;
@@ -146,8 +156,7 @@ export class UpdateEvenement implements OnInit {
     }
 
     const val = this.form.value;
-    
-    // Payload STRICTEMENT conforme à l'exemple API de succès
+
     const payload: any = {
       id: this.id,
       libelle: val.libelle,
@@ -157,7 +166,9 @@ export class UpdateEvenement implements OnInit {
       description: val.description,
       statut: val.statut,
       typeEvenementId: Number(val.typeEvenementId),
-      typesPlace: val.typesPlace || []
+      typesPlace: val.typesPlace || [],
+      artistesIds: val.artistesIds || [],
+      organisateursIds: val.organisateursIds || []
     };
 
     this.isSubmitting = true;
@@ -165,7 +176,76 @@ export class UpdateEvenement implements OnInit {
 
     this.evenementService.updateEvenement(this.id, payload).subscribe({
       next: () => {
-        this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour avec succès', type: 'success' } });
+        // Gérer les changements des relations
+        const currentArtistesIds = val.artistesIds || [];
+        const currentOrganisateursIds = val.organisateursIds || [];
+
+        const relationsTasks: Observable<any>[] = [];
+
+        // Artistes à supprimer
+        this.previousArtistesIds.forEach(id => {
+          if (!currentArtistesIds.includes(id)) {
+            relationsTasks.push(
+              this.evenementService.removeArtisteFromEvenement(this.id, id)
+                .pipe(catchError(err => {
+                  console.error(`Erreur suppression artiste ${id}:`, err);
+                  return of(null);
+                }))
+            );
+          }
+        });
+
+        // Artistes à ajouter
+        currentArtistesIds.forEach((id: number) => {
+          if (!this.previousArtistesIds.includes(id)) {
+            relationsTasks.push(
+              this.evenementService.addArtisteToEvenement(this.id, id)
+                .pipe(catchError(err => {
+                  console.error(`Erreur ajout artiste ${id}:`, err);
+                  return of(null);
+                }))
+            );
+          }
+        });
+
+        // Organisateurs à supprimer
+        this.previousOrganisateursIds.forEach(id => {
+          if (!currentOrganisateursIds.includes(id)) {
+            relationsTasks.push(
+              this.evenementService.removeOrganisateurFromEvenement(this.id, id)
+                .pipe(catchError(err => {
+                  console.error(`Erreur suppression organisateur ${id}:`, err);
+                  return of(null);
+                }))
+            );
+          }
+        });
+
+        // Organisateurs à ajouter
+        currentOrganisateursIds.forEach((id: number) => {
+          if (!this.previousOrganisateursIds.includes(id)) {
+            relationsTasks.push(
+              this.evenementService.addOrganisateurToEvenement(this.id, id)
+                .pipe(catchError(err => {
+                  console.error(`Erreur ajout organisateur ${id}:`, err);
+                  return of(null);
+                }))
+            );
+          }
+        });
+
+        if (relationsTasks.length > 0) {
+          forkJoin(relationsTasks).subscribe({
+            next: () => {
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour avec succès', type: 'success' } });
+            },
+            error: () => {
+              this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour (certaines relations non mises à jour)', type: 'warning' } });
+            }
+          });
+        } else {
+          this.router.navigate(['/evenements'], { queryParams: { message: 'Événement mis à jour avec succès', type: 'success' } });
+        }
       },
       error: (err) => {
         console.error('Erreur lors de la mise à jour :', err);

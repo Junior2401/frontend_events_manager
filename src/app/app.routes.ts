@@ -35,6 +35,7 @@ import {DeleteAdministrateur} from './components/administrateurs/delete-administ
 import {UpdateAdministrateur} from './components/administrateurs/update-administrateur/update-administrateur';
 import {UpdateTypeEvenement} from './components/type_evenements/update-type-evenement/update-type-evenement';
 import {DeleteTypeEvenement} from './components/type_evenements/delete-type-evenement/delete-type-evenement';
+import {AchatTicket} from './components/tickets/achat-ticket/achat-ticket';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
@@ -42,9 +43,12 @@ export const routes: Routes = [
 
   { path: 'tickets', component: ListTicket, title: 'Liste tickets' },
   { path: 'tickets/create', component: CreateTicket, title: 'Nouveau ticket' },
+  { path: 'tickets/achat', component: AchatTicket, title: 'Achat de ticket' },
+  { path: 'tickets/achat/:eventId', component: AchatTicket, title: 'Achat de ticket' },
   { path: 'tickets/edit/:id', component: UpdateTicket, title: 'Modifier ticket' },
   { path: 'tickets/detail/:id', component: DetailTicket, title: 'Detail ticket' },
   { path: 'tickets/delete/:id', component: DeleteTicket, title: 'Supprimer ticket' },
+
 
   { path: 'evenements', component: ListEvenement, title: 'Liste evenements' },
   { path: 'evenements/create', component: CreateEvenement, title: 'Nouveau evenement' },
