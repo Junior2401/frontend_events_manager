@@ -1,52 +1,88 @@
-<div class="card shadow-sm border-0 mb-4">
-
-  <!-- HEADER -->
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <!-- Header Moderne -->
   <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-    <h5 class="card-title mb-0 fw-bold">
-      <i class="bi bi-calendar-event-fill text-primary me-2"></i>
-      Détail du type d'événement
-    </h5>
-
-    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()">
-      <i class="bi bi-arrow-left"></i> Retour
+    <div class="d-flex align-items-center">
+      <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-tag-fill text-primary fs-4"></i>
+      </div>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Détails du Type d'Événement</h5>
+        <small class="text-muted">Configuration de la catégorie</small>
+      </div>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" (click)="onBack()">
+      <i class="bi bi-arrow-left me-1"></i> Retour
     </button>
   </div>
 
-  <!-- LOADING -->
+  <!-- Loading State -->
   <div *ngIf="isLoading" class="card-body text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-3">Chargement...</p>
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des détails...</p>
   </div>
 
-  <!-- CONTENT -->
-  <div *ngIf="!isLoading && typeEvenement" class="card-body px-4 py-4">
-
-    <!-- SECTION : Informations générales -->
-    <h6 class="text-uppercase text-muted fw-bold small mb-3">
-      <i class="bi bi-info-circle me-1"></i> Informations générales
-    </h6>
-
-    <div class="row g-3">
-
-      <!-- Libellé -->
-      <div class="col-md-6">
-        <div class="p-3 border rounded bg-light">
-          <div class="text-muted small">
-            <i class="bi bi-tag"></i> Libellé
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && typeEvenement" class="card-body p-0">
+    
+    <!-- Info Header Section -->
+    <div class="bg-light p-4 border-bottom">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm">
+            <i class="bi bi-diagram-3 fs-2"></i>
           </div>
-          <div class="fw-semibold fs-6">{{ typeEvenement.libelle }}</div>
+        </div>
+        <div class="col">
+          <h2 class="fw-bold mb-1 text-dark">{{ typeEvenement.libelle }}</h2>
+          <div class="d-flex gap-3 small text-muted">
+            <span><i class="bi bi-hash me-1"></i> Catégorie #{{ typeEvenement.id }}</span>
+            <span><i class="bi bi-check2-circle me-1 text-success"></i> Statut Actif</span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Description -->
-      <div class="col-md-6">
-        <div class="p-3 border rounded bg-light">
-          <div class="text-muted small">
-            <i class="bi bi-card-text"></i> Description
+    <div class="p-4">
+      <div class="row g-4">
+        <!-- Informations Générales -->
+        <div class="col-12">
+          <div class="p-4 border rounded-3 bg-white shadow-xs">
+            <h6 class="text-primary fw-bold mb-4 d-flex align-items-center">
+              <i class="bi bi-info-square me-2"></i> Description & Libellé
+            </h6>
+            
+            <div class="row g-4">
+              <div class="col-md-4">
+                <label class="small text-muted d-block mb-1">Nom du type</label>
+                <div class="fw-bold fs-5 text-dark">{{ typeEvenement.libelle }}</div>
+              </div>
+              <div class="col-md-8">
+                <label class="small text-muted d-block mb-1">Description détaillée</label>
+                <div class="text-dark">{{ typeEvenement.description || 'Aucune description fournie pour ce type d\'événement.' }}</div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top">
+               <div class="alert alert-info border-0 mb-0 d-flex align-items-center bg-opacity-10 text-dark">
+                 <i class="bi bi-lightbulb-fill text-info me-3 fs-5"></i>
+                 <div class="small">
+                   Les types d'événements permettent de classer vos soirées, concerts ou conférences pour une meilleure visibilité dans le catalogue public.
+                 </div>
+               </div>
+            </div>
           </div>
-          <div class="fw-semibold fs-6">{{ typeEvenement.description || '-' }}</div>
         </div>
       </div>
-
     </div>
   </div>
+
+  <!-- Footer Actions -->
+  <div class="card-footer bg-light border-top d-flex justify-content-end gap-2 py-3 px-4">
+    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4" [routerLink]="['/type-evenements/edit', typeEvenement?.id]">
+      <i class="bi bi-pencil-square me-1"></i> Modifier le type
+    </button>
+    <button type="button" class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm" [routerLink]="['/type-evenements/delete', typeEvenement?.id]">
+      <i class="bi bi-trash-fill me-1"></i> Supprimer
+    </button>
+  </div>
+</div>

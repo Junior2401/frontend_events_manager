@@ -1,111 +1,120 @@
-<div class="card card-outline card-primary shadow-sm">
-  <div class="card-header border-0 bg-transparent py-3">
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom py-3">
     <div class="d-flex justify-content-between align-items-center">
-      <h3 class="card-title fw-bold mb-0">
-        <i class="bi bi-calendar-event-fill text-primary me-2"></i>
-        Liste des Événements
-      </h3>
-      <div class="card-tools">
-        <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm"
-                [routerLink]="['/evenements/create']">
-          <i class="bi bi-plus-circle me-1"></i> Nouvel Événement
-        </button>
+      <div class="d-flex align-items-center">
+        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+          <i class="bi bi-calendar-event text-primary fs-4"></i>
+        </div>
+        <div>
+          <h5 class="card-title mb-0 fw-bold">Gestion des Événements</h5>
+          <small class="text-muted">{{ evenements.length }} événement(s) programmé(s)</small>
+        </div>
       </div>
+      <button class="btn btn-primary rounded-pill px-4 shadow-sm" [routerLink]="['/evenements/create']">
+        <i class="bi bi-plus-circle me-1"></i> Nouvel Événement
+      </button>
     </div>
   </div>
 
   <div class="card-body p-0">
     <!-- Notification -->
-    <div *ngIf="notification" class="px-4 pt-3">
-      <div [class]="'alert alert-' + notification.type + ' alert-dismissible fade show'" role="alert">
-        <i [class]="notification.type === 'success' ? 'bi bi-check-circle-fill me-2' : 'bi bi-exclamation-triangle-fill me-2'"></i>
-        {{ notification.message }}
+    <div *ngIf="notification" class="p-3">
+      <div [class]="'alert alert-' + notification.type + ' border-0 shadow-sm d-flex align-items-center'" role="alert">
+        <i [class]="notification.type === 'success' ? 'bi bi-check-circle-fill fs-5 me-3' : 'bi bi-exclamation-triangle-fill fs-5 me-3'"></i>
+        <div class="flex-grow-1">{{ notification.message }}</div>
         <button type="button" class="btn-close" (click)="closeNotification()" aria-label="Close"></button>
       </div>
     </div>
 
     <!-- Spinner chargement -->
     <div *ngIf="isLoading" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status"></div>
-      <p class="text-muted mt-2 small">Chargement...</p>
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+      <p class="text-muted mt-3">Chargement des événements...</p>
     </div>
 
-    <div *ngIf="!isLoading" class="table-responsive p-4">
-      <table id="example1" class="table table-hover table-striped align-middle border-top">
-         <thead class="bg-light">
-         <tr>
-           <th class="border-bottom-0 py-3">#</th>
-           <th class="border-bottom-0 py-3">Libellé</th>
-           <th class="border-bottom-0 py-3">Type</th>
-           <th class="border-bottom-0 py-3">Lieu</th>
-           <th class="border-bottom-0 py-3">Date</th>
-           <th class="border-bottom-0 py-3">Capacité</th>
-           <th class="border-bottom-0 py-3">Remplissage</th>
-           <th class="border-bottom-0 py-3">Statut</th>
-           <th class="border-bottom-0 py-3 text-end px-4" style="width: 150px;">Actions</th>
-         </tr>
-         </thead>
-         <tbody>
-         <tr *ngFor="let item of evenements; let i = index">
-           <td class="fw-semibold text-muted">{{ i + 1 }}</td>
-           <td class="fw-semibold">{{ item?.libelle }}</td>
-           <td>
-             <span class="badge bg-info text-dark" *ngIf="item?.typeEvenement">
-               {{ item?.typeEvenement?.libelle }}
-             </span>
-             <span class="badge bg-secondary text-muted small" *ngIf="!item?.typeEvenement">-</span>
-           </td>
-           <td class="fw-semibold text-muted small">{{ item?.lieu }}</td>
-           <td class="fw-semibold small">{{ formatDate(item?.date) }}</td>
-           <td class="fw-semibold">{{ item?.capacite }}</td>
-           <td>
-             <div class="d-flex align-items-center">
-               <div class="progress flex-grow-1 me-2" style="height: 6px; min-width: 50px;">
-                 <div [class]="'progress-bar ' + (getFillPercentage(item) > 90 ? 'bg-danger' : (getFillPercentage(item) > 70 ? 'bg-warning' : 'bg-success'))"
-                      [style.width.%]="getFillPercentage(item)"></div>
-               </div>
-               <span class="small fw-bold" [class.text-danger]="getFillPercentage(item) >= 100">
-                 {{ getFillPercentage(item) }}%
-               </span>
-             </div>
-           </td>
-           <td class="fw-semibold">
-             <span [class]="'badge ' + getStatusBadgeClass(item?.statut)">{{ getStatusLabel(item?.statut) }}</span>
-           </td>
-          <td class="text-end px-4">
-            <div class="btn-group shadow-sm">
-              <button class="btn btn-sm btn-success border-end text-white" title="Réserver un ticket"
-                      [routerLink]="['/tickets/achat', item.id]" [disabled]="!item.id || getFillPercentage(item) >= 100">
-                <i class="bi bi-cart-plus"></i>
-              </button>
-              <button class="btn btn-sm btn-light border-end text-info" title="Detail"
-                      [routerLink]="['/evenements/detail', item.id]" [disabled]="!item.id">
-                <i class="bi bi-eye"></i>
-              </button>
-              <button class="btn btn-sm btn-light border-end text-primary" title="Modifier"
-                      [routerLink]="['/evenements/edit', item.id]" [disabled]="!item.id">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-sm btn-light text-danger" title="Supprimer"
-                      [routerLink]="['/evenements/delete', item.id]" [disabled]="!item.id">
-                <i class="bi bi-trash-fill"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light text-muted small text-uppercase fw-bold">
+          <tr>
+            <th class="ps-4" style="width: 50px;">#</th>
+            <th>Événement</th>
+            <th>Lieu & Date</th>
+            <th>Capacité</th>
+            <th>Remplissage</th>
+            <th>Statut</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of evenements; let i = index">
+            <td class="ps-4 text-muted">{{ i + 1 }}</td>
+            <td>
+              <div class="fw-bold text-dark">{{ item?.libelle }}</div>
+              <div class="badge bg-info bg-opacity-10 text-info small" *ngIf="item?.typeEvenement">
+                {{ item?.typeEvenement?.libelle }}
+              </div>
+            </td>
+            <td>
+              <div class="small fw-semibold text-dark"><i class="bi bi-geo-alt me-1 text-danger"></i> {{ item?.lieu }}</div>
+              <div class="small text-muted"><i class="bi bi-calendar3 me-1 text-primary"></i> {{ formatDate(item?.date) }}</div>
+            </td>
+            <td>
+              <div class="fw-bold text-dark">{{ item?.capacite }}</div>
+              <div class="small text-muted">places</div>
+            </td>
+            <td style="min-width: 150px;">
+              <div class="d-flex align-items-center">
+                <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                  <div [class]="'progress-bar ' + (getFillPercentage(item) > 90 ? 'bg-danger' : (getFillPercentage(item) > 70 ? 'bg-warning' : 'bg-success'))"
+                       [style.width.%]="getFillPercentage(item)"></div>
+                </div>
+                <span class="small fw-bold" [class.text-danger]="getFillPercentage(item) >= 100">
+                  {{ getFillPercentage(item) }}%
+                </span>
+              </div>
+            </td>
+            <td>
+              <span [class]="'badge rounded-pill px-3 py-2 border shadow-xs ' + getStatusBadgeClass(item?.statut)">
+                {{ getStatusLabel(item?.statut) }}
+              </span>
+            </td>
+            <td class="text-end pe-4">
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-outline-success rounded-circle shadow-xs" title="Réserver"
+                        [routerLink]="['/tickets/achat', item.id]" [disabled]="!item.id || getFillPercentage(item) >= 100">
+                  <i class="bi bi-cart-plus"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info rounded-circle shadow-xs" title="Détail"
+                        [routerLink]="['/evenements/detail', item.id]" [disabled]="!item.id">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-primary rounded-circle shadow-xs" title="Modifier"
+                        [routerLink]="['/evenements/edit', item.id]" [disabled]="!item.id">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger rounded-circle shadow-xs" title="Supprimer"
+                        [routerLink]="['/evenements/delete', item.id]" [disabled]="!item.id">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
 
-         <tr *ngIf="evenements.length === 0">
-           <td colspan="9" class="text-center text-muted py-5">
-             <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-             Aucune donnée disponible.
-           </td>
-         </tr>
+          <tr *ngIf="evenements.length === 0">
+            <td colspan="7" class="text-center py-5">
+              <div class="py-4">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3">Aucun événement n'est programmé pour le moment.</p>
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm" [routerLink]="['/evenements/create']">
+                  Créer le premier événement
+                </button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="card-footer bg-transparent border-0 py-2 px-4 text-muted small">
-    {{ evenements.length }} événement(s) trouvé(s)
-  </div>
+  <div class="card-footer bg-white border-0 py-2"></div>
 </div>

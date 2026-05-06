@@ -1,52 +1,47 @@
-<div class="card shadow-sm border-0 mb-4">
-
-  <!-- HEADER -->
-  <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-    <h5 class="card-title mb-0 fw-semibold">Confirmation de suppression</h5>
-  </div>
-
-  <!-- LOADING -->
-  <div *ngIf="isLoading" class="card-body text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-3">Chargement...</p>
-  </div>
-
-  <!-- CONTENT -->
-  <div *ngIf="!isLoading && typeEvenement" class="card-body bg-warning text-center py-4">
-
-    <p class="fs-5">
-      Êtes-vous sûr de vouloir supprimer le type d'événement
-      <strong class="text-primary">"{{ typeEvenement.libelle }}"</strong> ?
-    </p>
-
-    <p class="text-muted">
-      Cette action est irréversible.
-    </p>
-
-  </div>
-
-  <!-- FOOTER -->
-  <div class="card-footer bg-white border-top">
-    <div class="row justify-content-center">
-
-      <!-- Bouton Retour -->
-      <div class="col-sm-4 mb-2">
-        <button class="btn btn-sm btn-secondary w-100" (click)="onBack()">
-          <i class="bi bi-arrow-left-circle"></i> Retour
-        </button>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom py-3">
+    <div class="d-flex align-items-center">
+      <div class="bg-danger bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-exclamation-octagon text-danger fs-4"></i>
       </div>
-
-      <!-- Bouton Supprimer -->
-      <div class="col-sm-4">
-        <button
-          class="btn btn-sm btn-danger w-100"
-          (click)="onDelete()"
-          [disabled]="isSubmitting">
-          Supprimer <i class="bi bi-trash-fill"></i>
-        </button>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Confirmer la Suppression</h5>
+        <small class="text-muted">Retrait d'une catégorie d'événement</small>
       </div>
-
     </div>
   </div>
 
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des données...</p>
+  </div>
+
+  <div *ngIf="!isLoading && typeEvenement" class="card-body p-5 text-center">
+    <div class="avatar-circle bg-danger text-white mx-auto mb-4 shadow-sm" style="width: 100px; height: 100px; font-size: 2.5rem;">
+      <i class="bi bi-diagram-3-fill"></i>
+    </div>
+    
+    <h3 class="fw-bold text-dark mb-2">"{{ typeEvenement.libelle }}"</h3>
+    <p class="text-muted fs-5 mb-4">Souhaitez-vous vraiment supprimer ce type d'événement ?</p>
+    
+    <div class="alert alert-danger border-0 d-inline-block px-4 py-3 rounded-3 shadow-xs">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-shield-slash fs-4 me-3"></i>
+        <div class="text-start">
+          <div class="fw-bold">Action irréversible</div>
+          <div class="small">Les événements associés à ce type pourraient être impactés.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer bg-light border-top py-3 d-flex justify-content-center gap-3">
+    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="onBack()">
+      <i class="bi bi-x-circle me-1"></i> Annuler
+    </button>
+    <button type="button" class="btn btn-danger rounded-pill px-4 shadow-sm" (click)="onDelete()" [disabled]="isSubmitting">
+      <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+      Confirmer la suppression <i class="bi bi-trash-fill ms-1"></i>
+    </button>
+  </div>
 </div>

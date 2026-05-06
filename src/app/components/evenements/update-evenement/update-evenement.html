@@ -1,78 +1,109 @@
-<div class="card card-warning card-outline mb-4">
-  <div class="card-header">
-    <div class="card-title">Modifier Événement</div>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom py-3">
+    <div class="d-flex align-items-center">
+      <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-pencil-square text-warning fs-4"></i>
+      </div>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Modifier l'Événement</h5>
+        <small class="text-muted">Ajustez les détails et la planification de votre événement</small>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="isLoading" class="card-body text-center py-4">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-2 mb-0">Chargement...</p>
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des données de l'événement...</p>
   </div>
 
   <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label for="libelle" class="form-label">Libelle <span class="text-danger">*</span></label>
-          <input id="libelle" type="text" class="form-control" formControlName="libelle" [class.is-invalid]="form.get('libelle')?.touched && form.get('libelle')?.invalid">
-          <div class="invalid-feedback" *ngIf="form.get('libelle')?.touched && form.get('libelle')?.invalid">Ce champ est obligatoire.</div>
-        </div>
-
-        <div class="col-md-6">
-          <label for="lieu" class="form-label">Lieu <span class="text-danger">*</span></label>
-          <input id="lieu" type="text" class="form-control" formControlName="lieu" [class.is-invalid]="form.get('lieu')?.touched && form.get('lieu')?.invalid">
-          <div class="invalid-feedback" *ngIf="form.get('lieu')?.touched && form.get('lieu')?.invalid">Ce champ est obligatoire.</div>
-        </div>
-
-        <div class="col-md-6">
-          <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
-          <input id="date" type="datetime-local" class="form-control" formControlName="date" [class.is-invalid]="form.get('date')?.touched && form.get('date')?.invalid">
-          <div class="invalid-feedback" *ngIf="form.get('date')?.touched && form.get('date')?.invalid">Ce champ est obligatoire.</div>
-        </div>
-
-        <div class="col-md-6">
-          <label for="capacite" class="form-label">Capacite <span class="text-danger">*</span></label>
-          <input id="capacite" type="number" class="form-control" formControlName="capacite" [class.is-invalid]="form.get('capacite')?.touched && form.get('capacite')?.invalid">
-          <div class="invalid-feedback" *ngIf="form.get('capacite')?.touched && form.get('capacite')?.invalid">
-            <span *ngIf="form.get('capacite')?.errors?.['required']">Ce champ est obligatoire.</span>
-            <span *ngIf="form.get('capacite')?.errors?.['min']">La capacité doit être d'au moins 1.</span>
+    <div class="card-body p-4">
+      <div class="row g-4">
+        <!-- Titre de l'événement en vedette -->
+        <div class="col-12">
+          <div class="p-3 bg-light rounded-3 border-start border-warning border-4 mb-2">
+            <label class="form-label fw-bold text-warning small text-uppercase">Libellé de l'événement <span class="text-danger">*</span></label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-card-heading text-muted"></i></span>
+              <input id="libelle" type="text" class="form-control border-start-0 ps-0 fw-bold" formControlName="libelle" placeholder="Ex: Festival de Jazz 2024"
+                     [class.is-invalid]="form.get('libelle')?.touched && form.get('libelle')?.invalid">
+              <div class="invalid-feedback">Le libellé est obligatoire pour identifier l'événement.</div>
+            </div>
           </div>
         </div>
 
         <div class="col-md-6">
-          <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
-          <select id="statut" class="form-select" formControlName="statut" [class.is-invalid]="form.get('statut')?.touched && form.get('statut')?.invalid">
-            <option value="" disabled>Choisir un statut</option>
-            <option value="CREE">Créé</option>
-            <option value="VALIDE">Validé</option>
-            <option value="ANNULE">Annulé</option>
-            <option value="PLANIFIE">Planifié</option>
-          </select>
-          <div class="invalid-feedback" *ngIf="form.get('statut')?.touched && form.get('statut')?.invalid">Ce champ est obligatoire.</div>
+          <label for="lieu" class="form-label fw-semibold">Lieu / Emplacement <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt"></i></span>
+            <input id="lieu" type="text" class="form-control border-start-0 ps-0" formControlName="lieu" placeholder="Ex: Stade de France, Paris"
+                   [class.is-invalid]="form.get('lieu')?.touched && form.get('lieu')?.invalid">
+            <div class="invalid-feedback">Le lieu est requis pour les participants.</div>
+          </div>
         </div>
 
         <div class="col-md-6">
-          <label for="typeEvenementId" class="form-label">Type evenement <span class="text-danger">*</span></label>
-          <select id="typeEvenementId" class="form-select" formControlName="typeEvenementId" [class.is-invalid]="form.get('typeEvenementId')?.touched && form.get('typeEvenementId')?.invalid">
-            <option value="null" disabled>Choisir un type</option>
-            <option *ngFor="let type of typeEvenements" [value]="type.id">{{ type.libelle }}</option>
-          </select>
-          <div class="invalid-feedback" *ngIf="form.get('typeEvenementId')?.touched && form.get('typeEvenementId')?.invalid">
-            <span *ngIf="form.get('typeEvenementId')?.errors?.['required']">Ce champ est obligatoire.</span>
-            <span *ngIf="form.get('typeEvenementId')?.errors?.['min']">Veuillez choisir un type valide.</span>
+          <label for="date" class="form-label fw-semibold">Date & Heure <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+            <input id="date" type="datetime-local" class="form-control border-start-0 ps-0" formControlName="date"
+                   [class.is-invalid]="form.get('date')?.touched && form.get('date')?.invalid">
+            <div class="invalid-feedback">Veuillez définir une date valide.</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="capacite" class="form-label fw-semibold">Capacité Totale <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-people"></i></span>
+            <input id="capacite" type="number" class="form-control border-start-0 ps-0" formControlName="capacite" placeholder="Nombre de places"
+                   [class.is-invalid]="form.get('capacite')?.touched && form.get('capacite')?.invalid">
+            <div class="invalid-feedback">
+              <span *ngIf="form.get('capacite')?.errors?.['required']">La capacité est obligatoire.</span>
+              <span *ngIf="form.get('capacite')?.errors?.['min']">La capacité doit être d'au moins 1.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="statut" class="form-label fw-semibold">Statut de l'événement <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-info-circle"></i></span>
+            <select id="statut" class="form-select border-start-0 ps-0" formControlName="statut" [class.is-invalid]="form.get('statut')?.touched && form.get('statut')?.invalid">
+              <option value="" disabled>Choisir un statut</option>
+              <option value="CREE">Créé</option>
+              <option value="VALIDE">Validé</option>
+              <option value="ANNULE">Annulé</option>
+              <option value="PLANIFIE">Planifié</option>
+            </select>
+            <div class="invalid-feedback">Le statut est obligatoire.</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="typeEvenementId" class="form-label fw-semibold">Type d'Événement <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-diagram-3"></i></span>
+            <select id="typeEvenementId" class="form-select border-start-0 ps-0" formControlName="typeEvenementId"
+                    [class.is-invalid]="form.get('typeEvenementId')?.touched && form.get('typeEvenementId')?.invalid">
+              <option value="null" disabled>-- Choisir une catégorie --</option>
+              <option *ngFor="let type of typeEvenements" [value]="type.id">{{ type.libelle }}</option>
+            </select>
+            <div class="invalid-feedback">Veuillez catégoriser votre événement.</div>
           </div>
         </div>
 
         <div class="col-12">
-          <label class="form-label">Catégories de places disponibles</label>
-          <div class="border rounded p-3" style="background-color: #f8f9fa;">
-            <div class="row row-cols-2 row-cols-md-4 g-2">
+          <label class="form-label fw-semibold">Catégories de places disponibles</label>
+          <div class="p-3 bg-light rounded-3 border">
+            <div class="row row-cols-2 row-cols-md-4 g-3">
               <div *ngFor="let type of availableTypesPlace" class="col">
-                <div class="form-check">
+                <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox"
                          [id]="'typePlace-' + type"
                          [checked]="isTypePlaceSelected(type)"
                          (change)="onTypePlaceChange(type, $event)">
-                  <label class="form-check-label" [for]="'typePlace-' + type">
+                  <label class="form-check-label small fw-medium" [for]="'typePlace-' + type">
                     {{ type }}
                   </label>
                 </div>
@@ -82,54 +113,66 @@
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Artistes participants</label>
-          <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background-color: #f8f9fa;">
-            <div *ngFor="let artiste of artistes" class="form-check">
+          <label class="form-label fw-semibold">Artistes participants</label>
+          <div class="border rounded-3 p-3 bg-white shadow-xs" style="max-height: 200px; overflow-y: auto;">
+            <div *ngFor="let artiste of artistes" class="form-check mb-2">
               <input class="form-check-input" type="checkbox"
                      [id]="'artiste-' + artiste.id"
                      [value]="artiste.id"
                      [checked]="isArtisteSelected(artiste.id!)"
                      (change)="onArtisteChange(artiste.id!, $event)">
-              <label class="form-check-label" [for]="'artiste-' + artiste.id">
-                {{ artiste.nom }} {{ artiste.prenom }}
+              <label class="form-check-label small" [for]="'artiste-' + artiste.id">
+                <span class="fw-bold">{{ artiste.nomDeScene }}</span>
+                <span class="text-muted ms-1">({{ artiste.prenom }} {{ artiste.nom }})</span>
               </label>
             </div>
-            <div *ngIf="artistes.length === 0" class="text-muted small">Aucun artiste disponible</div>
+            <div *ngIf="artistes.length === 0" class="text-center py-3 text-muted small">
+              <i class="bi bi-mic-mute d-block fs-4 mb-2"></i>
+              Aucun artiste disponible
+            </div>
           </div>
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Organisateurs</label>
-          <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto; background-color: #f8f9fa;">
-            <div *ngFor="let org of organisateurs" class="form-check">
+          <label class="form-label fw-semibold">Organisateurs</label>
+          <div class="border rounded-3 p-3 bg-white shadow-xs" style="max-height: 200px; overflow-y: auto;">
+            <div *ngFor="let org of organisateurs" class="form-check mb-2">
               <input class="form-check-input" type="checkbox"
                      [id]="'org-' + org.id"
                      [value]="org.id"
                      [checked]="isOrganisateurSelected(org.id!)"
                      (change)="onOrganisateurChange(org.id!, $event)">
-              <label class="form-check-label" [for]="'org-' + org.id">
-                {{ org.nom }}
+              <label class="form-check-label small" [for]="'org-' + org.id">
+                <span class="fw-bold">{{ org.societe }}</span>
+                <span class="text-muted ms-1">({{ org.nom }})</span>
               </label>
             </div>
-            <div *ngIf="organisateurs.length === 0" class="text-muted small">Aucun organisateur disponible</div>
+            <div *ngIf="organisateurs.length === 0" class="text-center py-3 text-muted small">
+              <i class="bi bi-building-exclamation d-block fs-4 mb-2"></i>
+              Aucun organisateur disponible
+            </div>
           </div>
         </div>
 
         <div class="col-12">
-          <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-          <textarea id="description" class="form-control" rows="3" formControlName="description" [class.is-invalid]="form.get('description')?.touched && form.get('description')?.invalid"></textarea>
-          <div class="invalid-feedback" *ngIf="form.get('description')?.touched && form.get('description')?.invalid">Ce champ est obligatoire.</div>
+          <label for="description" class="form-label fw-semibold">Description détaillée <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="bi bi-justify-left"></i></span>
+            <textarea id="description" class="form-control border-start-0 ps-0" rows="4" formControlName="description" placeholder="Décrivez l'événement, le programme, les conditions..."
+                      [class.is-invalid]="form.get('description')?.touched && form.get('description')?.invalid"></textarea>
+            <div class="invalid-feedback">Une description est nécessaire pour informer les participants.</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="card-footer">
-      <button type="submit" class="btn btn-warning float-end" [disabled]="isSubmitting">
-        <i class="bi bi-check-circle"></i> Mettre a jour
+    <div class="card-footer bg-light border-top py-3 d-flex justify-content-end gap-2 px-4">
+      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="onBack()">
+        Annuler
       </button>
-
-      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
-        <i class="bi bi-arrow-left-circle"></i> Retour
+      <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm" [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+        Enregistrer les modifications <i class="bi bi-check-circle ms-1"></i>
       </button>
     </div>
   </form>

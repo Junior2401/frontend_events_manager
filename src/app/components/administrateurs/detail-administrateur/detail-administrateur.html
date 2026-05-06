@@ -1,97 +1,118 @@
-<div class="card shadow-sm border-0 mb-4">
-
-  <!-- HEADER -->
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <!-- Header Moderne -->
   <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-    <h5 class="card-title mb-0 fw-bold">
-      <i class="bi bi-person-badge-fill text-primary me-2"></i>
-      Détail Administrateur
-    </h5>
-
-    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()">
-      <i class="bi bi-arrow-left"></i> Retour
+    <div class="d-flex align-items-center">
+      <div class="bg-dark bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-person-workspace text-dark fs-4"></i>
+      </div>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Profil Administrateur</h5>
+        <small class="text-muted">Gestion des droits et accès système</small>
+      </div>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" (click)="onBack()">
+      <i class="bi bi-arrow-left me-1"></i> Retour
     </button>
   </div>
 
-  <!-- LOADING -->
+  <!-- Loading State -->
   <div *ngIf="isLoading" class="card-body text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des privilèges...</p>
   </div>
 
-  <!-- CONTENT -->
-  <div *ngIf="!isLoading && administrateur" class="card-body px-4 py-4">
-
-    <!-- SECTION : Informations générales -->
-    <h6 class="text-uppercase text-muted fw-bold small mb-3">
-      <i class="bi bi-info-circle me-1"></i> Informations générales
-    </h6>
-
-    <div class="row g-3">
-
-      <!-- Nom -->
-      <div class="col-md-6">
-        <div class="p-3 border rounded bg-light">
-          <div class="text-muted small">
-            <i class="bi bi-person"></i> Nom
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && administrateur" class="card-body p-0">
+    
+    <!-- Profil Header Section -->
+    <div class="bg-light p-4 border-bottom">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <div class="avatar-circle bg-dark text-white d-flex align-items-center justify-content-center shadow-sm">
+            <span class="fs-2 fw-bold">{{ (administrateur.prenom?.substring(0, 1) || '') + (administrateur.nom?.substring(0, 1) || '') | uppercase }}</span>
           </div>
-          <div class="fw-semibold fs-6">{{ administrateur.nom }}</div>
+        </div>
+        <div class="col">
+          <h3 class="fw-bold mb-1 text-dark">{{ administrateur.prenom }} {{ administrateur.nom }}</h3>
+          <div class="d-flex gap-3 small text-muted">
+            <span><i class="bi bi-hash me-1"></i> Admin #{{ administrateur.id }}</span>
+            <span><i class="bi bi-shield-check me-1"></i> Système</span>
+          </div>
+        </div>
+        <div class="col-md-auto mt-3 mt-md-0">
+           <span class="badge rounded-pill px-4 py-2 fs-6 shadow-xs border" [ngClass]="getRoleBadge(administrateur.role).class">
+             <i [class]="getRoleBadge(administrateur.role).icon" class="me-2"></i>
+             {{ getRoleBadge(administrateur.role).label }}
+           </span>
         </div>
       </div>
+    </div>
 
-      <!-- Prénom -->
-      <div class="col-md-6">
-        <div class="p-3 border rounded bg-light">
-          <div class="text-muted small">
-            <i class="bi bi-person"></i> Prénom
+    <div class="p-4">
+      <div class="row g-4">
+        <!-- Informations personnelles -->
+        <div class="col-md-6">
+          <div class="p-4 border rounded-3 bg-white h-100 shadow-xs">
+            <h6 class="text-primary fw-bold mb-4 d-flex align-items-center">
+              <i class="bi bi-info-circle me-2"></i> Identité & Contact
+            </h6>
+            
+            <div class="mb-4">
+              <label class="small text-muted d-block mb-1">Nom complet</label>
+              <div class="fw-bold fs-5 text-dark">{{ administrateur.prenom }} {{ administrateur.nom }}</div>
+            </div>
+
+            <div class="mb-0">
+              <label class="small text-muted d-block mb-1">Email de gestion</label>
+              <div class="d-flex align-items-center p-2 bg-light rounded border-start border-primary border-4">
+                <i class="bi bi-envelope-check text-primary me-2"></i>
+                <a [href]="'mailto:' + administrateur.email" class="text-decoration-none fw-bold text-dark">{{ administrateur.email }}</a>
+              </div>
+            </div>
           </div>
-          <div class="fw-semibold fs-6">{{ administrateur.prenom }}</div>
+        </div>
+
+        <!-- Droits & Sécurité -->
+        <div class="col-md-6">
+          <div class="p-4 border rounded-3 bg-white h-100 shadow-xs">
+            <h6 class="text-primary fw-bold mb-4 d-flex align-items-center">
+              <i class="bi bi-lock me-2"></i> Sécurité & Rôle
+            </h6>
+
+            <div class="mb-4">
+              <label class="small text-muted d-block mb-1">Niveau de privilège</label>
+              <div class="d-flex align-items-center mt-1">
+                <div class="p-2 rounded bg-light border me-3">
+                   <i [class]="getRoleBadge(administrateur.role).icon" class="fs-4 text-dark"></i>
+                </div>
+                <div>
+                   <div class="fw-bold">{{ getRoleBadge(administrateur.role).label }}</div>
+                   <div class="small text-muted">Accès complet aux modules système</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top">
+               <div class="alert alert-warning border-0 mb-0 d-flex align-items-start bg-opacity-10 text-dark">
+                 <i class="bi bi-exclamation-triangle-fill text-warning me-3 mt-1"></i>
+                 <div class="small">
+                   Les comptes administrateurs ont des permissions étendues. Assurez-vous de la légitimité des accès.
+                 </div>
+               </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Email -->
-      <div class="col-md-6">
-        <div class="p-3 border rounded bg-light">
-          <div class="text-muted small">
-            <i class="bi bi-envelope"></i> Email
-          </div>
-          <div class="fw-semibold fs-6">{{ administrateur.email }}</div>
-        </div>
-      </div>
-
-      <!-- Rôle -->
-      <div class="col-md-6">
-        <div class="p-3 border rounded bg-light">
-          <div class="text-muted small">
-            <i class="bi bi-shield-lock"></i> Rôle
-          </div>
-
-          <span class="badge px-3 py-2 fs-6 d-inline-flex align-items-center"
-                [ngClass]="getRoleBadge(administrateur.role).class">
-            <i [class]="getRoleBadge(administrateur.role).icon" class="me-1"></i>
-            {{ getRoleBadge(administrateur.role).label }}
-          </span>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
-
-    <button type="button"
-            class="btn btn-warning btn-sm"
-            [routerLink]="['/administrateurs/edit', administrateur?.id]"
-            [disabled]="!administrateur?.id">
-      <i class="bi bi-pencil-square"></i> Modifier
+  <!-- Footer Actions -->
+  <div class="card-footer bg-light border-top d-flex justify-content-end gap-2 py-3 px-4">
+    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4" [routerLink]="['/administrateurs/edit', administrateur?.id]">
+      <i class="bi bi-pencil-square me-1"></i> Modifier le compte
     </button>
-
-    <button type="button"
-            class="btn btn-danger btn-sm"
-            [routerLink]="['/administrateurs/delete', administrateur?.id]"
-            [disabled]="!administrateur?.id">
-      <i class="bi bi-trash-fill"></i> Supprimer
+    <button type="button" class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm" [routerLink]="['/administrateurs/delete', administrateur?.id]">
+      <i class="bi bi-trash-fill me-1"></i> Supprimer
     </button>
-
   </div>
-
 </div>

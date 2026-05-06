@@ -1,38 +1,81 @@
-<div class="card card-warning card-outline mb-4">
-  <div class="card-header"><div class="card-title">Modifier Organisateur</div></div>
-  <div *ngIf="isLoading" class="card-body text-center py-4"><div class="spinner-border text-primary"></div></div>
-  <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="card-body row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Nom <span class="text-danger">*</span></label>
-        <input class="form-control" formControlName="nom" [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
-        <div class="invalid-feedback">Le nom est obligatoire.</div>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom py-3">
+    <div class="d-flex align-items-center">
+      <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-pencil-square text-warning fs-4"></i>
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Prenom <span class="text-danger">*</span></label>
-        <input class="form-control" formControlName="prenom" [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
-        <div class="invalid-feedback">Le prénom est obligatoire.</div>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Email <span class="text-danger">*</span></label>
-        <input class="form-control" type="email" formControlName="email" [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
-        <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['required']">L'email est obligatoire.</div>
-        <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['email']">Veuillez entrer un email valide.</div>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Societe <span class="text-danger">*</span></label>
-        <input class="form-control" formControlName="societe" [class.is-invalid]="form.get('societe')?.touched && form.get('societe')?.invalid">
-        <div class="invalid-feedback">La société est obligatoire.</div>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Telephone pro <span class="text-danger">*</span></label>
-        <input class="form-control" formControlName="telephonePro" [class.is-invalid]="form.get('telephonePro')?.touched && form.get('telephonePro')?.invalid">
-        <div class="invalid-feedback">Le téléphone professionnel est obligatoire.</div>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Modifier le Partenaire</h5>
+        <small class="text-muted">Mise à jour des coordonnées de la structure</small>
       </div>
     </div>
-    <div class="card-footer">
-      <button type="submit" class="btn btn-warning float-end" [disabled]="isSubmitting"><i class="bi bi-check-circle"></i> Mettre a jour</button>
-      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()"><i class="bi bi-arrow-left-circle"></i> Retour</button>
+  </div>
+
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des données...</p>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="card-body p-4">
+      <div class="row g-4">
+        <!-- Informations Structure -->
+        <div class="col-12">
+          <div class="p-3 bg-light rounded-3 border-start border-warning border-4 mb-2 shadow-xs">
+            <label class="form-label fw-bold text-dark small text-uppercase">Nom de la Société / Organisation <span class="text-danger">*</span></label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-building text-muted"></i></span>
+              <input class="form-control border-start-0 ps-0 fw-bold text-dark" formControlName="societe" placeholder="Ex: Event Pro Inc." 
+                     [class.is-invalid]="form.get('societe')?.touched && form.get('societe')?.invalid">
+              <div class="invalid-feedback">La raison sociale est requise.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Nom du Contact Principal <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="nom" placeholder="Nom" 
+                 [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
+          <div class="invalid-feedback">Le nom est obligatoire.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Prénom du Contact Principal <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="prenom" placeholder="Prénom" 
+                 [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+          <div class="invalid-feedback">Le prénom est obligatoire.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Email de la Structure <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope-at"></i></span>
+            <input class="form-control border-start-0 ps-0" type="email" formControlName="email" placeholder="contact@exemple.com" 
+                   [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
+            <div class="invalid-feedback">Un email valide est requis.</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Téléphone Professionnel <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone"></i></span>
+            <input class="form-control border-start-0 ps-0" formControlName="telephonePro" placeholder="Numéro professionnel" 
+                   [class.is-invalid]="form.get('telephonePro')?.touched && form.get('telephonePro')?.invalid">
+            <div class="invalid-feedback">Le numéro de téléphone est obligatoire.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer bg-light border-top py-3 d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="onBack()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm" [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+        Mettre à jour le partenaire <i class="bi bi-check-circle ms-1"></i>
+      </button>
     </div>
   </form>
 </div>

@@ -1,74 +1,105 @@
-<div class="card card-outline card-primary shadow-sm">
-  <div class="card-header border-0 bg-transparent py-3">
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom py-3">
     <div class="d-flex justify-content-between align-items-center">
-      <h3 class="card-title fw-bold mb-0">
-        <i class="bi bi-music-note-beamed text-primary me-2"></i>
-        Liste des Artistes
-      </h3>
-      <div class="card-tools">
-        <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" [routerLink]="['/artistes/create']">
-          <i class="bi bi-plus-circle me-1"></i> Nouvel Artiste
-        </button>
+      <div class="d-flex align-items-center">
+        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+          <i class="bi bi-music-note-beamed text-primary fs-4"></i>
+        </div>
+        <div>
+          <h5 class="card-title mb-0 fw-bold">Gestion des Artistes</h5>
+          <small class="text-muted">{{ artistes.length }} talent(s) répertorié(s)</small>
+        </div>
       </div>
+      <button class="btn btn-primary rounded-pill px-4 shadow-sm" [routerLink]="['/artistes/create']">
+        <i class="bi bi-plus-circle-fill me-2"></i> Ajouter un artiste
+      </button>
     </div>
   </div>
 
   <div class="card-body p-0">
     <!-- Notification -->
-    <div *ngIf="notification" class="px-4 pt-3">
-      <div [class]="'alert alert-' + notification.type + ' alert-dismissible fade show'" role="alert">
-        <i [class]="notification.type === 'success' ? 'bi bi-check-circle-fill me-2' : 'bi bi-exclamation-triangle-fill me-2'"></i>
-        {{ notification.message }}
+    <div *ngIf="notification" class="p-3">
+      <div [class]="'alert alert-' + notification.type + ' border-0 shadow-sm d-flex align-items-center'" role="alert">
+        <i [class]="notification.type === 'success' ? 'bi bi-check-circle-fill fs-5 me-3' : 'bi bi-exclamation-triangle-fill fs-5 me-3'"></i>
+        <div class="flex-grow-1">{{ notification.message }}</div>
         <button type="button" class="btn-close" (click)="closeNotification()" aria-label="Close"></button>
       </div>
     </div>
 
+    <!-- État de chargement -->
     <div *ngIf="isLoading" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status"></div>
-      <p class="text-muted mt-2 small">Chargement...</p>
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+      <p class="text-muted mt-3">Chargement de la scène...</p>
     </div>
 
-    <div *ngIf="!isLoading" class="table-responsive p-4">
-      <table id="example1" class="table table-hover table-striped align-middle border-top">
-        <thead class="bg-light">
-        <tr>
-          <th>#</th>
-          <th>Nom</th>
-          <th>Prenom</th>
-          <th>Email</th>
-          <th>Nom de scene</th>
-          <th class="text-end px-4">Actions</th>
-        </tr>
+    <!-- Tableau modernisé -->
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light text-muted small text-uppercase fw-bold">
+          <tr>
+            <th class="ps-4" style="width: 50px;">#</th>
+            <th>Artiste</th>
+            <th>Nom de Scène</th>
+            <th>Contact / Email</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let item of artistes; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ item.nom }}</td>
-          <td>{{ item.prenom }}</td>
-          <td>{{ item.email }}</td>
-          <td>{{ item.nomDeScene }}</td>
-          <td class="text-end px-4">
-            <div class="btn-group shadow-sm">
-              <button class="btn btn-sm btn-light border-end text-info" title="Détail" [routerLink]="['/artistes/detail', item.id]" [disabled]="!item.id">
-                <i class="bi bi-eye"></i>
-              </button>
-              <button class="btn btn-sm btn-light border-end text-primary" title="Modifier" [routerLink]="['/artistes/edit', item.id]" [disabled]="!item.id">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-sm btn-light text-danger" title="Supprimer" [routerLink]="['/artistes/delete', item.id]" [disabled]="!item.id">
-                <i class="bi bi-trash-fill"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr *ngIf="artistes.length === 0">
-          <td colspan="6" class="text-center text-muted py-5">Aucune donnee disponible.</td>
-        </tr>
+          <tr *ngFor="let item of artistes; let i = index">
+            <td class="ps-4 text-muted">{{ i + 1 }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar-circle avatar-sm me-3 shadow-xs bg-info">
+                  {{ (item.nomDeScene?.substring(0,1) || item.prenom?.substring(0,1) || '') | uppercase }}
+                </div>
+                <div>
+                  <div class="fw-bold text-dark">{{ item.prenom }} {{ item.nom }}</div>
+                  <div class="text-muted small">ID Artiste #{{ item.id }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill fw-bold border border-info border-opacity-25">
+                <i class="bi bi-mic me-1"></i> {{ item.nomDeScene }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center text-muted small">
+                <i class="bi bi-envelope-at me-2 text-primary"></i>
+                <span class="fw-semibold">{{ item.email }}</span>
+              </div>
+            </td>
+            <td class="text-end pe-4">
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-outline-info rounded-circle shadow-xs" title="Détail" [routerLink]="['/artistes/detail', item.id]">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-primary rounded-circle shadow-xs" title="Modifier" [routerLink]="['/artistes/edit', item.id]">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger rounded-circle shadow-xs" title="Supprimer" [routerLink]="['/artistes/delete', item.id]">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- État vide -->
+          <tr *ngIf="artistes.length === 0">
+            <td colspan="5" class="text-center py-5">
+              <div class="py-4">
+                <i class="bi bi-music-note-list text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3">Aucun artiste répertorié pour le moment.</p>
+                <button class="btn btn-sm btn-primary rounded-pill mt-2" [routerLink]="['/artistes/create']">
+                  Ajouter le premier artiste
+                </button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="card-footer bg-transparent border-0 py-3">
-  </div>
+  <div class="card-footer bg-white border-0 py-2"></div>
 </div>

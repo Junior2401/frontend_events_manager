@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UtilisateurApiService } from '../../../services/utilisateur-api.service';
 import { Utilisateur } from '../../../models/utilisateur';
@@ -7,7 +7,7 @@ import { Utilisateur } from '../../../models/utilisateur';
 @Component({
   selector: 'app-detail-utilisateur',
   standalone: true,
-  imports: [NgIf, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './detail-utilisateur.html',
   styleUrl: './detail-utilisateur.css'
 })

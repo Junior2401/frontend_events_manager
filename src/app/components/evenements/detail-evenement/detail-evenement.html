@@ -1,151 +1,173 @@
-<div class="card shadow-sm border-0 mb-4">
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <!-- Header Moderne -->
   <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-    <h5 class="card-title mb-0 fw-semibold">Détail Événement</h5>
-    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onBack()">
-      <i class="bi bi-arrow-left"></i> Retour
+    <div class="d-flex align-items-center">
+      <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-calendar-check text-primary fs-4"></i>
+      </div>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Détails de l'Événement</h5>
+        <small class="text-muted">Fiche complète et planification</small>
+      </div>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" (click)="onBack()">
+      <i class="bi bi-arrow-left me-1"></i> Retour
     </button>
   </div>
 
+  <!-- Loading State -->
   <div *ngIf="isLoading" class="card-body text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-3">Chargement des détails...</p>
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des informations...</p>
   </div>
 
-  <div *ngIf="!isLoading && evenement" class="card-body">
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && evenement" class="card-body p-0">
     
-    <!-- STATISTIQUES DE VENTE -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="p-3 border rounded bg-light shadow-sm">
-          <div class="d-flex justify-content-between align-items-end mb-2">
-            <div>
-              <h6 class="fw-bold mb-0 text-uppercase small text-muted">Suivi des places</h6>
-              <div class="fs-4 fw-bold text-primary">{{ evenement?.ticketsVendus || 0 }} / {{ evenement?.capacite }}</div>
-            </div>
-            <div class="text-end">
-              <span class="badge bg-success" *ngIf="(evenement?.placesDisponibles || 0) > 10">
-                {{ evenement?.placesDisponibles }} places disponibles
-              </span>
-              <span class="badge bg-warning text-dark" *ngIf="(evenement?.placesDisponibles || 0) <= 10 && (evenement?.placesDisponibles || 0) > 0">
-                Attention : {{ evenement?.placesDisponibles }} places restantes
-              </span>
-              <span class="badge bg-danger" *ngIf="(evenement?.placesDisponibles || 0) === 0">
-                COMPLET
-              </span>
-            </div>
+    <!-- Event Summary Section -->
+    <div class="bg-light p-4 border-bottom">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px; font-size: 2rem;">
+            <i class="bi bi-megaphone"></i>
           </div>
-          <div class="progress border" style="height: 12px;">
-            <div [class]="'progress-bar progress-bar-striped progress-bar-animated ' + 
-                          (fillPercentage > 90 ? 'bg-danger' : (fillPercentage > 70 ? 'bg-warning' : 'bg-success'))" 
-                 role="progressbar" 
-                 [style.width.%]="fillPercentage">
-            </div>
+        </div>
+        <div class="col">
+          <h2 class="fw-bold mb-1 text-dark">{{ evenement.libelle }}</h2>
+          <div class="d-flex flex-wrap gap-3 small text-muted">
+            <span><i class="bi bi-geo-alt me-1 text-danger"></i> {{ evenement.lieu }}</span>
+            <span><i class="bi bi-clock me-1 text-primary"></i> {{ formatDate(evenement.date) }}</span>
+            <span><i class="bi bi-hash me-1"></i> Événement #{{ evenement.id }}</span>
           </div>
+        </div>
+        <div class="col-md-auto mt-3 mt-md-0">
+           <span [class]="'badge rounded-pill px-4 py-2 fs-6 shadow-xs ' + getStatusBadgeClass(evenement.statut)">
+             {{ getStatusLabel(evenement.statut) }}
+           </span>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <!-- COLONNE GAUCHE : INFOS GENERALES -->
-      <div class="col-md-6 border-end">
-        <h6 class="text-primary fw-bold mb-3 border-bottom pb-2">Informations Générales</h6>
-        
-        <div class="row mb-2">
-          <div class="col-5 text-muted small">Libellé</div>
-          <div class="col-7 fw-semibold">{{ evenement?.libelle }}</div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-5 text-muted small">Type d'Événement</div>
-          <div class="col-7">
-            <span class="badge bg-info text-dark" *ngIf="evenement?.typeEvenement">
-              {{ evenement?.typeEvenement?.libelle }}
+    <div class="p-4">
+      <!-- STATISTIQUES DE VENTE (FULL WIDTH) -->
+      <div class="mb-4 p-4 border rounded-3 bg-white shadow-xs">
+        <div class="d-flex justify-content-between align-items-end mb-2">
+          <div>
+            <h6 class="text-primary fw-bold mb-0 text-uppercase small">Suivi du Remplissage</h6>
+            <div class="fs-3 fw-bold text-dark">{{ evenement.ticketsVendus || 0 }} <span class="text-muted fs-5 fw-normal">/ {{ evenement.capacite }} places</span></div>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2" *ngIf="(evenement.placesDisponibles || 0) > 10">
+              <i class="bi bi-check-circle me-1"></i> {{ evenement.placesDisponibles }} disponibles
+            </span>
+            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2" *ngIf="(evenement.placesDisponibles || 0) <= 10 && (evenement.placesDisponibles || 0) > 0">
+              <i class="bi bi-exclamation-triangle me-1"></i> {{ evenement.placesDisponibles }} restantes
+            </span>
+            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2" *ngIf="(evenement.placesDisponibles || 0) === 0">
+              <i class="bi bi-x-circle me-1"></i> COMPLET
             </span>
           </div>
         </div>
-
-        <div class="row mb-2">
-          <div class="col-5 text-muted small">Lieu</div>
-          <div class="col-7">{{ evenement?.lieu }}</div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-5 text-muted small">Date</div>
-          <div class="col-7">{{ formatDate(evenement?.date) }}</div>
-        </div>
-
-        <div class="row mb-2">
-          <div class="col-5 text-muted small">Statut</div>
-          <div class="col-7">
-            <span [class]="'badge ' + getStatusBadgeClass(evenement?.statut)">
-              {{ getStatusLabel(evenement?.statut) }}
-            </span>
+        <div class="progress border rounded-pill" style="height: 12px;">
+          <div [class]="'progress-bar progress-bar-striped progress-bar-animated rounded-pill ' + 
+                        (fillPercentage > 90 ? 'bg-danger' : (fillPercentage > 70 ? 'bg-warning' : 'bg-success'))" 
+               role="progressbar" 
+               [style.width.%]="fillPercentage">
           </div>
         </div>
-
-        <div class="row mb-2">
-          <div class="col-5 text-muted small">Description</div>
-          <div class="col-7 text-wrap small">{{ evenement?.description }}</div>
-        </div>
-
-        <!-- TYPES DE PLACES -->
-        <h6 class="text-primary fw-bold mb-3 border-bottom pb-2 mt-4">Types de Places</h6>
-        <div *ngIf="evenement?.typesPlace && evenement?.typesPlace?.length! > 0; else noTypesPlace">
-          <div class="d-flex flex-wrap gap-2">
-            <span class="badge bg-outline-secondary border text-dark fw-normal" *ngFor="let tp of evenement?.typesPlace">
-              <i class="bi bi-tag-fill text-secondary me-1"></i> {{ tp }}
-            </span>
-          </div>
-        </div>
-        <ng-template #noTypesPlace>
-          <p class="text-muted small">Aucun type de place configuré.</p>
-        </ng-template>
       </div>
 
-      <!-- COLONNE DROITE : ARTISTES ET ORGANISATEURS -->
-      <div class="col-md-6 ps-md-4">
-        <h6 class="text-primary fw-bold mb-3 border-bottom pb-2 mt-4 mt-md-0">Participants</h6>
-        
-        <!-- ARTISTES -->
-        <p class="fw-bold small mb-1">Artistes :</p>
-        <div *ngIf="evenement?.artistes && evenement?.artistes?.length! > 0; else noArtistes">
-          <ul class="list-group list-group-flush mb-3">
-            <li class="list-group-item py-1 px-0 bg-transparent border-0 small" *ngFor="let a of evenement?.artistes">
-              <i class="bi bi-music-note-beamed text-primary me-2"></i>
-              {{ a.nomDeScene }} <span class="text-muted">({{ a.prenom }} {{ a.nom }})</span>
-            </li>
-          </ul>
-        </div>
-        <ng-template #noArtistes>
-          <p class="text-muted small mb-3">Aucun artiste affecté.</p>
-        </ng-template>
+      <div class="row g-4">
+        <!-- Informations Générales -->
+        <div class="col-md-7">
+          <div class="p-4 border rounded-3 bg-white h-100 shadow-xs">
+            <h6 class="text-primary fw-bold mb-4 d-flex align-items-center border-bottom pb-3">
+              <i class="bi bi-info-circle me-2"></i> À propos de l'événement
+            </h6>
+            
+            <div class="mb-4">
+              <label class="small text-muted d-block mb-1">Catégorie</label>
+              <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill fw-bold border border-info border-opacity-25" *ngIf="evenement.typeEvenement">
+                {{ evenement.typeEvenement.libelle }}
+              </span>
+            </div>
 
-        <!-- ORGANISATEURS -->
-        <p class="fw-bold small mb-1">Organisateurs :</p>
-        <div *ngIf="evenement?.organisateurs && evenement?.organisateurs?.length! > 0; else noOrgs">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item py-1 px-0 bg-transparent border-0 small" *ngFor="let o of evenement?.organisateurs">
-              <i class="bi bi-building text-primary me-2"></i>
-              {{ o.societe }} <span class="text-muted">({{ o.nom }})</span>
-            </li>
-          </ul>
+            <div class="mb-4">
+              <label class="small text-muted d-block mb-1">Description</label>
+              <p class="text-dark small lh-lg">{{ evenement.description || 'Aucune description disponible.' }}</p>
+            </div>
+
+            <div class="mb-0">
+              <label class="small text-muted d-block mb-2">Options de Billetterie</label>
+              <div *ngIf="evenement.typesPlace && evenement.typesPlace.length > 0; else noTypesPlace" class="d-flex flex-wrap gap-2">
+                <span class="badge bg-light text-dark border fw-normal px-3 py-2 rounded-3" *ngFor="let tp of evenement.typesPlace">
+                  <i class="bi bi-tag text-secondary me-1"></i> {{ tp }}
+                </span>
+              </div>
+              <ng-template #noTypesPlace>
+                <div class="text-muted small italic">Aucune catégorie de place définie.</div>
+              </ng-template>
+            </div>
+          </div>
         </div>
-        <ng-template #noOrgs>
-          <p class="text-muted small">Aucun organisateur affecté.</p>
-        </ng-template>
+
+        <!-- Participants -->
+        <div class="col-md-5">
+          <div class="p-4 border rounded-3 bg-white h-100 shadow-xs">
+            <h6 class="text-primary fw-bold mb-4 d-flex align-items-center border-bottom pb-3">
+              <i class="bi bi-people me-2"></i> Équipe & Programmation
+            </h6>
+            
+            <!-- ARTISTES -->
+            <div class="mb-4">
+              <p class="fw-bold small text-muted text-uppercase mb-3">Artistes à l'affiche</p>
+              <div *ngIf="evenement.artistes && evenement.artistes.length > 0; else noArtistes">
+                <div *ngFor="let a of evenement.artistes" class="d-flex align-items-center mb-3 p-2 rounded-3 hover-bg-light transition">
+                  <div class="avatar-circle avatar-sm bg-info text-white me-3" style="width: 40px; height: 40px;">
+                    {{ a.nomDeScene?.substring(0,1) || a.prenom?.substring(0,1) | uppercase }}
+                  </div>
+                  <div>
+                    <div class="fw-bold small text-dark">{{ a.nomDeScene }}</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ a.styleArtistique }}</div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noArtistes>
+                <div class="p-3 bg-light rounded text-center small text-muted italic">Aucun artiste programmé.</div>
+              </ng-template>
+            </div>
+
+            <!-- ORGANISATEURS -->
+            <div>
+              <p class="fw-bold small text-muted text-uppercase mb-3">Produit par</p>
+              <div *ngIf="evenement.organisateurs && evenement.organisateurs.length > 0; else noOrgs">
+                <div *ngFor="let o of evenement.organisateurs" class="d-flex align-items-center mb-2">
+                  <div class="bg-secondary bg-opacity-10 p-2 rounded-circle me-3 text-secondary" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-building small"></i>
+                  </div>
+                  <div class="fw-semibold small text-dark">{{ o.societe }}</div>
+                </div>
+              </div>
+              <ng-template #noOrgs>
+                <div class="p-3 bg-light rounded text-center small text-muted italic">Aucun organisateur assigné.</div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="card-footer bg-white border-top d-flex justify-content-end gap-2 py-3">
-    <button type="button" class="btn btn-success btn-sm text-white" [routerLink]="['/tickets/achat', evenement?.id]" [disabled]="!evenement?.id || fillPercentage >= 100">
-      <i class="bi bi-cart-plus"></i> Réserver une place
+  <!-- Footer Actions -->
+  <div class="card-footer bg-light border-top d-flex justify-content-end gap-2 py-3 px-4">
+    <button type="button" class="btn btn-success btn-sm rounded-pill px-4 shadow-sm" [routerLink]="['/tickets/achat', evenement?.id]" [disabled]="!evenement?.id || fillPercentage >= 100">
+      <i class="bi bi-cart-plus me-1"></i> Réserver
     </button>
-    <button type="button" class="btn btn-primary btn-sm" [routerLink]="['/evenements/edit', evenement?.id]" [disabled]="!evenement?.id">
-      <i class="bi bi-pencil-square"></i> Modifier
+    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4" [routerLink]="['/evenements/edit', evenement?.id]" [disabled]="!evenement?.id">
+      <i class="bi bi-pencil-square me-1"></i> Modifier
     </button>
-    <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/evenements/delete', evenement?.id]" [disabled]="!evenement?.id">
-      <i class="bi bi-trash-fill"></i> Supprimer
+    <button type="button" class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm" [routerLink]="['/evenements/delete', evenement?.id]" [disabled]="!evenement?.id">
+      <i class="bi bi-trash-fill me-1"></i> Supprimer
     </button>
   </div>
 </div>

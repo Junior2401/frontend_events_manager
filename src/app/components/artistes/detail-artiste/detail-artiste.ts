@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArtisteApiService } from '../../../services/artiste-api.service';
 import { Artiste } from '../../../models/artiste';
@@ -7,7 +7,7 @@ import { Artiste } from '../../../models/artiste';
 @Component({
   selector: 'app-detail-artiste',
   standalone: true,
-  imports: [NgIf, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './detail-artiste.html' ,
   styleUrl: './detail-artiste.css'
 })

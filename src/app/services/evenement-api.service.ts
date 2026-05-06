@@ -37,7 +37,7 @@ export class EvenementApiService {
   getOrganisateursByEvenement(id: number): Observable<Organisateur[]> {
     return this.http.get<Organisateur[]>(`${this.apiUrl}/${id}/organisateurs`).pipe(
       catchError(err => {
-        console.warn(`Endpoint GET /evenements/${id}/organisateurs not found (404), will rely on event.organisateurs property`);
+        console.warn(`Endpoint GET /evenements/${id}/organisateurs not found (404), `);
         return of([]);
       })
     );

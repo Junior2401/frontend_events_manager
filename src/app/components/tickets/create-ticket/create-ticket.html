@@ -1,86 +1,117 @@
-<div class="card card-primary card-outline mb-4">
-  <div class="card-header">
-    <div class="card-title">Nouvel Achat de Ticket</div>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom py-3">
+    <div class="d-flex align-items-center">
+      <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
+        <i class="bi bi-ticket-perforated text-success fs-4"></i>
+      </div>
+      <div>
+        <h5 class="card-title mb-0 fw-bold">Émettre un Ticket</h5>
+        <small class="text-muted">Enregistrez manuellement une nouvelle réservation</small>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="isLoading" class="card-body text-center py-4">
-    <div class="spinner-border text-primary"></div>
-    <p class="text-muted mt-2">Chargement des données...</p>
+  <div *ngIf="isLoading" class="card-body text-center py-5">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted mt-3">Chargement des données de vente...</p>
   </div>
 
   <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="card-body">
+    <div class="card-body p-4">
       
       <!-- Erreur de capacité -->
-      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-        <i class="bi bi-exclamation-octagon-fill me-2"></i>
-        {{ errorMessage }}
-        <button type="button" class="btn-close" (click)="errorMessage = null" aria-label="Close"></button>
+      <div *ngIf="errorMessage" class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4 bg-opacity-10 text-danger" role="alert">
+        <i class="bi bi-exclamation-octagon-fill fs-4 me-3"></i>
+        <div class="fw-bold">{{ errorMessage }}</div>
+        <button type="button" class="btn-close ms-auto" (click)="errorMessage = null" aria-label="Close"></button>
       </div>
 
-      <div class="row g-3">
-        <!-- EVENEMENT -->
+      <div class="row g-4">
+        <!-- ÉVÉNEMENT -->
         <div class="col-md-12">
-          <label class="form-label">Événement <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="evenementId" [class.is-invalid]="form.get('evenementId')?.touched && form.get('evenementId')?.invalid">
-            <option [value]="0" disabled>-- Sélectionner l'événement --</option>
-            <option *ngFor="let ev of evenements" [value]="ev.id">{{ ev.libelle }} ({{ formatDate(ev.date) }} - Capacité: {{ ev.capacite }})</option>
-          </select>
-          <div class="invalid-feedback">Le choix d'un événement est obligatoire.</div>
+          <label class="form-label fw-semibold">Sélectionner l'Événement <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+            <select class="form-select border-start-0 ps-0" formControlName="evenementId" [class.is-invalid]="form.get('evenementId')?.touched && form.get('evenementId')?.invalid">
+              <option [value]="0" disabled>-- Choisir l'événement cible --</option>
+              <option *ngFor="let ev of evenements" [value]="ev.id">
+                {{ ev.libelle }} ({{ formatDate(ev.date) }} - Capacité: {{ ev.capacite }})
+              </option>
+            </select>
+            <div class="invalid-feedback">Le choix d'un événement est obligatoire.</div>
+          </div>
         </div>
 
         <!-- UTILISATEUR -->
         <div class="col-md-12">
-          <label class="form-label">Acheteur <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="utilisateurId" [class.is-invalid]="form.get('utilisateurId')?.touched && form.get('utilisateurId')?.invalid">
-            <option [value]="0" disabled>-- Sélectionner l'acheteur --</option>
-            <option *ngFor="let user of utilisateurs" [value]="user.id">{{ user.prenom }} {{ user.nom }} ({{ user.email }} - {{ formatPhone(user.telephone) }})</option>
-          </select>
-          <div class="invalid-feedback">Le choix d'un acheteur est obligatoire.</div>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Numéro place <span class="text-danger">*</span></label>
-          <input class="form-control" formControlName="numeroPlace" placeholder="Ex: A-12" [class.is-invalid]="form.get('numeroPlace')?.touched && form.get('numeroPlace')?.invalid">
-          <div class="invalid-feedback">Le numéro de place est obligatoire.</div>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Type de Place <span class="text-danger">*</span></label>
-          <select class="form-select" formControlName="place" [class.is-invalid]="form.get('place')?.touched && form.get('place')?.invalid">
-            <option value="" disabled>-- Choisir la catégorie --</option>
-            <option *ngFor="let type of selectedEventTypesPlace" [value]="type">{{ type }}</option>
-          </select>
-          <div class="invalid-feedback" *ngIf="selectedEventTypesPlace.length > 0">La catégorie est obligatoire.</div>
-          <div class="text-muted small mt-1" *ngIf="selectedEventTypesPlace.length === 0">
-            <i class="bi bi-info-circle"></i> Sélectionnez un événement pour voir les places disponibles.
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Prix <span class="text-danger">*</span></label>
+          <label class="form-label fw-semibold">Attribuer à l'Acheteur <span class="text-danger">*</span></label>
           <div class="input-group">
-            <input class="form-control bg-light" type="number" formControlName="prix" readonly>
-            <span class="input-group-text">€</span>
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-bounding-box"></i></span>
+            <select class="form-select border-start-0 ps-0" formControlName="utilisateurId" [class.is-invalid]="form.get('utilisateurId')?.touched && form.get('utilisateurId')?.invalid">
+              <option [value]="0" disabled>-- Sélectionner le membre --</option>
+              <option *ngFor="let user of utilisateurs" [value]="user.id">
+                {{ user.prenom }} {{ user.nom }} ({{ user.email }})
+              </option>
+            </select>
+            <div class="invalid-feedback">Le choix d'un acheteur est obligatoire.</div>
           </div>
-          <div class="text-muted small mt-1">Calculé automatiquement selon le type.</div>
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Statut <span class="text-danger">*</span></label>
-          <input class="form-control bg-light" type="text" [value]="'Acheté'" readonly>
+          <label class="form-label fw-semibold">Référence Place <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash"></i></span>
+            <input class="form-control border-start-0 ps-0" formControlName="numeroPlace" placeholder="Ex: Rang A - Place 12" 
+                   [class.is-invalid]="form.get('numeroPlace')?.touched && form.get('numeroPlace')?.invalid">
+            <div class="invalid-feedback">Le numéro de place est obligatoire.</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Catégorie de Tarif <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag"></i></span>
+            <select class="form-select border-start-0 ps-0" formControlName="place" [class.is-invalid]="form.get('place')?.touched && form.get('place')?.invalid">
+              <option value="" disabled>-- Choisir la catégorie --</option>
+              <option *ngFor="let type of selectedEventTypesPlace" [value]="type">{{ type }}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="selectedEventTypesPlace.length > 0">La catégorie est obligatoire.</div>
+          </div>
+          <div class="text-muted small mt-2" *ngIf="selectedEventTypesPlace.length === 0">
+            <i class="bi bi-info-circle me-1"></i> Sélectionnez d'abord un événement pour voir les tarifs.
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Prix Appliqué</label>
+          <div class="input-group input-group-lg">
+            <span class="input-group-text bg-white border-end-0 text-success fw-bold"><i class="bi bi-currency-euro"></i></span>
+            <input class="form-control border-start-0 ps-0 bg-white fw-bold text-success" type="number" formControlName="prix" readonly>
+          </div>
+          <small class="text-muted">Calculé selon la grille tarifaire de l'événement.</small>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">État Initial</label>
+          <div class="p-3 bg-light rounded-3 border d-flex align-items-center">
+            <i class="bi bi-check2-circle text-success fs-4 me-3"></i>
+            <div>
+              <div class="fw-bold">Acheté / Validé</div>
+              <div class="small text-muted">Le ticket sera actif immédiatement.</div>
+            </div>
+          </div>
           <input type="hidden" formControlName="statut">
         </div>
       </div>
     </div>
 
-    <div class="card-footer">
-      <button type="submit" class="btn btn-success float-end" [disabled]="isSubmitting">
-        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1"></span>
-        <i *ngIf="!isSubmitting" class="bi bi-cart-check"></i> Confirmer l'achat
+    <div class="card-footer bg-light border-top py-3 d-flex justify-content-end gap-2 px-4">
+      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="onBack()">
+        Annuler
       </button>
-      <button type="button" class="btn btn-secondary float-end me-2" (click)="onBack()">
-        <i class="bi bi-arrow-left-circle"></i> Retour
+      <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm" [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!isSubmitting" class="bi bi-cart-check me-1"></i> Confirmer l'émission
       </button>
     </div>
   </form>

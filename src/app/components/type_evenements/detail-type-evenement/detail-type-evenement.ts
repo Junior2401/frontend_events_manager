@@ -1,13 +1,15 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {TypeEvenement} from '../../../models/type-evenement';
 import {TypeEvenementApiService} from '../../../services/type-evenement-api.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-detail-type-evenement',
+  standalone: true,
   imports: [
-    NgIf
+    CommonModule,
+    RouterLink
   ],
   templateUrl: './detail-type-evenement.html',
   styleUrl: './detail-type-evenement.css',

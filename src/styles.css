@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+
 html, body {
     height: 100%;
 }
@@ -6,4 +6,37 @@ html, body {
 app-root {
     display: block;
     height: 100%;
+}
+
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid white;
+    background-color: var(--bs-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+    border-width: 2px;
+}
+
+.shadow-xs {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03) !important;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.btn-pill {
+    border-radius: 50rem;
 }

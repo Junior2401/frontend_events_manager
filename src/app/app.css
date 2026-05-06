@@ -1,23 +1,163 @@
-.app-sidebar {
-  background-color: #064e3b !important; /* Vert forêt très sombre */
-}
-.nav-link.active {
-  background-color: #3b82f6 !important; /* Votre bleu actif */
-  color: white !important;
-}
-/* 2. Force TOUS les éléments du menu en blanc (Texte et Icônes) */
-.sidebar-wrapper .nav-link,
-.sidebar-wrapper .nav-link i,
-.sidebar-wrapper .nav-link p,
-.sidebar-brand .brand-text,
-.sidebar-brand i {
-  color: #ffffff !important;
-  opacity: 1 !important; /* Enlève la transparence par défaut */
+
+.app-wrapper {
+  background-color: #f8fafc;
 }
 
+/* Modern Navbar */
 .app-header {
-  background-color: #064e3b !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
-.app-header .nav-link, .app-header .bi {
+
+.app-header .nav-link,
+.app-header .bi {
+  color: #475569 !important;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.app-header .nav-link:hover {
+  color: #0d6efd !important;
+  background: rgba(13, 110, 253, 0.05);
+  border-radius: 8px;
+}
+
+/* Modern Sidebar */
+.app-sidebar {
+  background: #1e293b !important; /* Slate 800 */
+  border-right: none !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05) !important;
+}
+
+.sidebar-brand {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem !important;
+}
+
+.sidebar-brand .brand-text {
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
   color: white !important;
+}
+
+.sidebar-wrapper {
+  padding: 1rem 0.75rem;
+}
+
+.sidebar-menu .nav-item {
+  margin-bottom: 4px;
+}
+
+.sidebar-menu .nav-link {
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  color: #94a3b8 !important; /* Slate 400 */
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.sidebar-menu .nav-link i {
+  font-size: 1.25rem;
+  margin-right: 0.75rem;
+  color: #64748b !important; /* Slate 500 */
+  transition: all 0.2s ease;
+}
+
+.sidebar-menu .nav-link p {
+  margin: 0;
+}
+
+/* Hover & Active States */
+.sidebar-menu .nav-link:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+}
+
+.sidebar-menu .nav-link:hover i {
+  color: #f8fafc !important;
+}
+
+.sidebar-menu .nav-link.active {
+  background: #3b82f6 !important; /* Bright Blue */
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu .nav-link.active i {
+  color: white !important;
+}
+
+/* Section Header */
+.nav-header {
+  color: #475569 !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+  padding-left: 1rem !important;
+}
+
+/* User Menu */
+.user-menu .user-image {
+  width: 32px;
+  height: 32px;
+  margin-top: -4px;
+}
+
+.dropdown-menu-lg {
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden;
+  padding: 0;
+}
+
+.user-header {
+  padding: 2rem 1rem !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+}
+
+/* Content Area Fixes */
+.app-main {
+  background-color: #f8fafc;
+}
+
+.app-content-header {
+  padding: 2rem 0 1rem 0 !important;
+}
+
+.app-content-header h3 {
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+.breadcrumb-item a {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* Footer Modernization */
+.app-footer {
+  background: white !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #64748b !important;
+  font-size: 0.85rem;
+  padding: 1rem 2rem !important;
 }
