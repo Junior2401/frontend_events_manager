@@ -42,13 +42,13 @@ export class AchatTicket implements OnInit {
   // Prix simulés par type de place
   private readonly prices: Record<string, number> = {
     'VIP': 150,
-    'Premium': 100,
-    'Gold': 120,
-    'Silver': 80,
-    'Standard': 50,
-    'Loge': 200,
-    'Balcon': 75,
-    'Orchestre': 90
+    'PREMIUM': 100,
+    'GOLD': 120,
+    'SILVER': 80,
+    'STANDARD': 50,
+    'LOGE': 200,
+    'BALCON': 75,
+    'ORCHESTRE': 90
   };
 
   constructor(
@@ -64,10 +64,14 @@ export class AchatTicket implements OnInit {
   ngOnInit(): void {
     const eventIdParam = this.route.snapshot.params['eventId'];
 
+    this.isLoading = true;
     this.evenementService.getEvenements().pipe(
-      catchError(() => of([]))
+      catchError(err => {
+        console.error('Erreur chargement événements:', err);
+        return of([]);
+      })
     ).subscribe((evenements) => {
-      this.evenements = evenements;
+      this.evenements = evenements || [];
 
       if (eventIdParam) {
         const id = Number(eventIdParam);
@@ -81,71 +85,151 @@ export class AchatTicket implements OnInit {
 
     // Surveiller les changements de type de place pour mettre à jour le prix
     this.form.get('place')?.valueChanges.subscribe(type => {
-      if (type && this.prices[type]) {
-        this.form.patchValue({ prix: this.prices[type] });
+      if (type) {
+        const upperType = String(type).toUpperCase();
+        const foundPrice = this.prices[upperType];
+        if (foundPrice) {
+          this.form.patchValue({ prix: foundPrice });
+        } else {
+          // Prix par défaut si la catégorie n'est pas dans la map simulée
+          this.form.patchValue({ prix: 50 });
+        }
+      } else {
+        this.form.patchValue({ prix: 0 });
       }
+      this.cdr.detectChanges();
     });
   }
 
-  onEvenementChange(id: number): void {
-    this.selectedEvenement = this.evenements.find(e => e.id === Number(id)) || null;
+  onEvenementChange(id: any): void {
+    const numericId = Number(id);
+    if (!numericId) return;
+
+    this.selectedEvenement = this.evenements.find(e => e.id === numericId) || null;
+    
+    // Si l'événement est trouvé mais n'a pas son type, on le charge
+    if (this.selectedEvenement && !this.selectedEvenement.typeEvenement) {
+      this.evenementService.getTypeEvenement(numericId).subscribe({
+        next: (type) => {
+          if (this.selectedEvenement && this.selectedEvenement.id === numericId) {
+            this.selectedEvenement.typeEvenement = type;
+            this.cdr.detectChanges();
+          }
+        }
+      });
+    }
+
     // Reset place and price when event changes
     this.form.patchValue({ place: '', prix: 0, numeroPlace: '' });
+    this.cdr.detectChanges();
+  }
+
+  formatDate(date: any): string {
+    if (!date) return 'Date non définie';
+    if (Array.isArray(date)) {
+      const [year, month, day, hour, minute] = date;
+      return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} ${String(hour ?? 0).padStart(2, '0')}:${String(minute ?? 0).padStart(2, '0')}`;
+    }
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return String(date);
+    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.errorMessage = "Veuillez remplir correctement tous les champs du formulaire.";
       return;
     }
+
+    const val = this.form.getRawValue();
+    const evenementId = Number(val.evenementId);
 
     this.isSubmitting = true;
     this.errorMessage = null;
     this.successMessage = null;
     this.cdr.detectChanges();
 
-    const val = this.form.getRawValue();
+    // 1. Vérifier la capacité et l'utilisateur
+    forkJoin({
+      event: this.evenementService.getEvenementById(evenementId).pipe(catchError(err => {
+        console.error('Erreur event:', err);
+        throw new Error("EVENT_NOT_FOUND");
+      })),
+      tickets: this.ticketService.getTicketsByEvenement(evenementId).pipe(catchError(() => of([]))),
+      users: this.utilisateurService.getUtilisateurs().pipe(catchError(() => of([])))
+    }).pipe(
+      switchMap(({ event, tickets, users }) => {
+        if (!event) throw new Error("EVENT_NOT_FOUND");
+        
+        const vendus = (tickets || []).filter(t => t && t.statut === 'ACHETE').length;
+        if (event.capacite > 0 && vendus >= event.capacite) {
+          throw new Error("COMPLET");
+        }
 
-    // 1. Créer l'utilisateur d'abord
-    const userPayload: Utilisateur = {
-      nom: val.nom,
-      prenom: val.prenom,
-      email: val.email,
-      telephone: val.telephone
-    };
-
-    this.utilisateurService.createUtilisateur(userPayload).pipe(
+        const email = String(val.email).toLowerCase().trim();
+        const existingUser = (users || []).find(u => u && u.email && u.email.toLowerCase().trim() === email);
+        
+        if (existingUser && existingUser.id) {
+          return of(existingUser);
+        } else {
+          const userPayload: Utilisateur = {
+            nom: val.nom,
+            prenom: val.prenom,
+            email: val.email,
+            telephone: val.telephone
+          };
+          return this.utilisateurService.createUtilisateur(userPayload).pipe(
+            catchError(err => {
+              // Tentative de récupération si conflit d'email
+              return this.utilisateurService.getUtilisateurs().pipe(
+                switchMap(newUsers => {
+                  const retryUser = (newUsers || []).find(u => u.email.toLowerCase().trim() === email);
+                  if (retryUser) return of(retryUser);
+                  throw err;
+                })
+              );
+            })
+          );
+        }
+      }),
       switchMap(user => {
-        // 2. Créer le ticket avec l'ID utilisateur obtenu
-        const ticketPayload: Ticket = {
+        if (!user || !user.id) throw new Error("USER_ERROR");
+        
+        const ticketPayload: any = {
           numeroPlace: val.numeroPlace,
           place: val.place,
-          prix: val.prix,
+          prix: Number(val.prix),
           statut: 'ACHETE',
-          evenementId: val.evenementId,
-          utilisateurId: user.id!
+          evenementId: evenementId,
+          utilisateurId: user.id
         };
         return this.ticketService.createTicket(ticketPayload);
-      }),
-      catchError(err => {
-        console.error(err);
-        throw err;
       })
     ).subscribe({
       next: () => {
-        this.successMessage = "Félicitations ! Votre ticket a été acheté avec succès.";
+        this.successMessage = "Félicitations ! Votre ticket a été réservé avec succès.";
         this.isSubmitting = false;
-        this.form.reset({ statut: 'ACHETE' });
+        this.form.reset({ statut: 'ACHETE', evenementId: 0, prix: 0 });
         this.selectedEvenement = null;
         this.cdr.detectChanges();
-
-        setTimeout(() => {
-          this.router.navigate(['/accueil']);
-        }, 5000);
+        setTimeout(() => this.router.navigate(['/accueil']), 3000);
       },
       error: (err) => {
-        this.errorMessage = "Une erreur est survenue lors du processus. Veuillez vérifier vos informations.";
         this.isSubmitting = false;
+        console.error('Erreur processus achat:', err);
+        
+        if (err.message === "COMPLET") {
+          this.errorMessage = "Désolé, cet événement est complet.";
+        } else if (err.message === "EVENT_NOT_FOUND") {
+          this.errorMessage = "L'événement sélectionné est introuvable ou n'existe plus.";
+        } else if (err.message === "USER_ERROR") {
+          this.errorMessage = "Erreur lors de la création de votre profil acheteur.";
+        } else if (err.status === 400) {
+          this.errorMessage = "Certaines informations sont incorrectes ou mal formatées.";
+        } else {
+          this.errorMessage = "Le serveur n'a pas pu traiter votre commande. Veuillez réessayer.";
+        }
         this.cdr.detectChanges();
       }
     });

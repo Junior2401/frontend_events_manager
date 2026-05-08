@@ -1,186 +1,193 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">
-      <img src="adminlte/AdminLTELogo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
-      EventManager
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+      <i class="bi bi-ticket-perforated-fill text-primary me-2 fs-3"></i>
+      <span>EventManager</span>
     </a>
     <div class="ms-auto">
-      <a routerLink="/accueil" class="btn btn-outline-light btn-sm">Accès Admin</a>
+      <a routerLink="/accueil" class="btn btn-outline-dark btn-sm fw-bold">
+        Accès Administration
+      </a>
     </div>
   </div>
 </nav>
 
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      
-      <!-- Titre et Introduction -->
-      <div class="text-center mb-5">
-        <h2 class="fw-bold text-primary">Billetterie en ligne</h2>
-        <p class="text-muted">Renseignez vos informations et réservez votre place en quelques secondes.</p>
-      </div>
+<div class="public-container py-5 min-vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xl-8 col-lg-10">
 
-      <!-- Messages Flash -->
-      <div *ngIf="successMessage" class="alert alert-success border-0 shadow-sm mb-4 animate__animated animate__fadeIn">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-check-circle-fill fs-4 me-3"></i>
-          <div>
-            <div class="fw-bold">Achat réussi !</div>
-            {{ successMessage }}
+        <!-- Header -->
+        <div class="page-header text-center mb-5">
+          <h2 class="mb-3">Achat de Ticket</h2>
+          <p>Choisissez votre événement et réservez votre place en quelques secondes.</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="stepper mb-5">
+          <div class="step" [class.active]="!form.get('evenementId')?.value">
+            <div class="step-circle">1</div>
+            <div class="step-label">Événement</div>
+          </div>
+          <div class="step" [class.active]="form.get('evenementId')?.value && !form.get('email')?.value">
+            <div class="step-circle">2</div>
+            <div class="step-label">Infos</div>
+          </div>
+          <div class="step" [class.active]="form.get('email')?.valid">
+            <div class="step-circle">3</div>
+            <div class="step-label">Validation</div>
           </div>
         </div>
-      </div>
 
-      <div *ngIf="errorMessage" class="alert alert-danger border-0 shadow-sm mb-4 animate__animated animate__shakeX">
-        <div class="d-flex align-items-center">
-          <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-          <div>
-            <div class="fw-bold">Oups !</div>
-            {{ errorMessage }}
+        <!-- Alert Messages -->
+        <div *ngIf="successMessage" class="alert alert-success modern-card border-0 p-4 mb-4">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-check-circle-fill fs-1 me-3"></i>
+            <div>
+              <h4 class="alert-heading mb-1 fw-bold">Achat Réussi !</h4>
+              <p class="mb-0 fs-5">{{ successMessage }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div *ngIf="isLoading" class="text-center py-5">
-        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-        <p class="text-muted mt-3">Chargement des événements...</p>
-      </div>
+        <div *ngIf="errorMessage" class="alert alert-danger modern-card border-0 p-4 mb-4">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-octagon-fill fs-1 me-3"></i>
+            <div>
+              <h4 class="alert-heading mb-1 fw-bold">Erreur</h4>
+              <p class="mb-0 fs-5">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
 
-      <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="row g-4">
-          
-          <!-- Section Événement -->
-          <div class="col-12">
-            <div class="card border-0 shadow-sm overflow-hidden">
-              <div class="card-header bg-primary text-white py-3">
-                <h5 class="card-title mb-0"><i class="bi bi-calendar-event me-2"></i> 1. Choisissez votre événement</h5>
+        <div *ngIf="isLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status"></div>
+          <p class="text-muted mt-3 fs-5 fw-bold">Chargement de la billetterie...</p>
+        </div>
+
+        <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+          <!-- SECTION 1: EVENT -->
+          <div class="modern-card">
+            <div class="card-header-modern">
+              <h5>1. Choix de l'Événement</h5>
+            </div>
+            <div class="card-body p-4">
+              <div class="mb-4">
+                <label class="form-label">Sélectionnez un événement :</label>
+                <select class="form-select" formControlName="evenementId"
+                        (change)="onEvenementChange(form.get('evenementId')?.value!)"
+                        [class.is-invalid]="form.get('evenementId')?.touched && form.get('evenementId')?.invalid">
+                  <option [ngValue]="0" disabled>-- Cliquer pour choisir --</option>
+                  <option *ngFor="let ev of evenements" [ngValue]="ev.id">{{ ev.libelle }}</option>
+                </select>
+                <div class="invalid-feedback fs-6">Vous devez choisir un événement.</div>
               </div>
-              <div class="card-body p-4">
-                <div class="mb-0">
-                  <label class="form-label fw-semibold">Événement</label>
-                  <select class="form-select form-select-lg" formControlName="evenementId" 
-                          (change)="onEvenementChange(form.get('evenementId')?.value!)"
-                          [class.is-invalid]="form.get('evenementId')?.touched && form.get('evenementId')?.invalid">
-                    <option [value]="0" disabled>-- Quel événement souhaitez-vous rejoindre ? --</option>
-                    <option *ngFor="let ev of evenements" [value]="ev.id">{{ ev.libelle }}</option>
+
+              <!-- Event Preview Card -->
+              <div *ngIf="selectedEvenement" class="event-ticket">
+                <div class="ticket-info">
+                  <span class="badge bg-primary mb-2 px-3 py-2 fs-6">
+                    {{ selectedEvenement.typeEvenement?.libelle }}
+                  </span>
+                  <h4>{{ selectedEvenement.libelle }}</h4>
+                  <div class="ticket-meta">
+                    <span><i class="bi bi-geo-alt-fill"></i> <strong>Lieu :</strong> {{ selectedEvenement.lieu }}</span>
+                    <span><i class="bi bi-calendar-event-fill"></i> <strong>Date :</strong> {{ formatDate(selectedEvenement.date) }}</span>
+                    <span><i class="bi bi-people-fill"></i> <strong>Capacité :</strong> {{ selectedEvenement.capacite }} places</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: USER INFOS -->
+          <div class="modern-card">
+            <div class="card-header-modern">
+              <h5>2. Vos Coordonnées</h5>
+            </div>
+            <div class="card-body p-4">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label">Prénom</label>
+                  <input type="text" class="form-control" formControlName="prenom" placeholder="Ex: Jean"
+                         [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Nom</label>
+                  <input type="text" class="form-control" formControlName="nom" placeholder="Ex: DUPONT"
+                         [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Adresse Email</label>
+                  <input type="email" class="form-control" formControlName="email" placeholder="jean.dupont@email.com"
+                         [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Numéro de Téléphone</label>
+                  <input type="tel" class="form-control" formControlName="telephone" placeholder="06 01 02 03 04"
+                         [class.is-invalid]="form.get('telephone')?.touched && form.get('telephone')?.invalid">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: TICKET DETAILS -->
+          <div class="modern-card">
+            <div class="card-header-modern">
+              <h5>3. Détails de la Place</h5>
+            </div>
+            <div class="card-body p-4">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label">Catégorie de Place</label>
+                  <select class="form-select" formControlName="place" [disabled]="!selectedEvenement"
+                          [class.is-invalid]="form.get('place')?.touched && form.get('place')?.invalid">
+                    <option value="" disabled>-- Choisir --</option>
+                    <option *ngFor="let type of selectedEvenement?.typesPlace" [value]="type">{{ type }}</option>
                   </select>
-                  <div class="invalid-feedback">Veuillez choisir un événement.</div>
-                </div>
-
-                <!-- Détails de l'événement sélectionné -->
-                <div *ngIf="selectedEvenement" class="mt-4 p-3 bg-light rounded-3 border animate__animated animate__fadeIn">
-                  <div class="row align-items-center">
-                    <div class="col-md-8">
-                      <div class="d-flex align-items-center mb-2">
-                        <i class="bi bi-geo-alt-fill text-danger me-2"></i>
-                        <span class="fw-bold">Lieu :</span>
-                        <span class="ms-2">{{ selectedEvenement.lieu }}</span>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <i class="bi bi-clock-fill text-primary me-2"></i>
-                        <span class="fw-bold">Date :</span>
-                        <span class="ms-2">{{ selectedEvenement.date }}</span>
-                      </div>
-                    </div>
-                    <div class="col-md-4 text-md-end mt-2 mt-md-0">
-                      <span class="badge rounded-pill bg-info text-dark px-3">{{ selectedEvenement.typeEvenement?.libelle }}</span>
-                    </div>
+                  <div class="text-muted small mt-2" *ngIf="!selectedEvenement">
+                    Veuillez d'abord sélectionner un événement.
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section Vos Coordonnées -->
-          <div class="col-12">
-            <div class="card border-0 shadow-sm overflow-hidden">
-              <div class="card-header bg-dark text-white py-3">
-                <h5 class="card-title mb-0"><i class="bi bi-person-bounding-box me-2"></i> 2. Vos coordonnées</h5>
-              </div>
-              <div class="card-body p-4">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Prénom</label>
-                    <input type="text" class="form-control" formControlName="prenom" placeholder="Ex: Jean"
-                           [class.is-invalid]="form.get('prenom')?.touched && form.get('prenom')?.invalid">
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Nom</label>
-                    <input type="text" class="form-control" formControlName="nom" placeholder="Ex: Dupont"
-                           [class.is-invalid]="form.get('nom')?.touched && form.get('nom')?.invalid">
-                  </div>
-                  <div class="col-md-7">
-                    <label class="form-label fw-semibold">Email</label>
-                    <input type="email" class="form-control" formControlName="email" placeholder="jean.dupont@email.com"
-                           [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
-                  </div>
-                  <div class="col-md-5">
-                    <label class="form-label fw-semibold">Téléphone</label>
-                    <input type="tel" class="form-control" formControlName="telephone" placeholder="06..."
-                           [class.is-invalid]="form.get('telephone')?.touched && form.get('telephone')?.invalid">
-                  </div>
+                <div class="col-md-6">
+                  <label class="form-label">Numéro Souhaité</label>
+                  <input type="text" class="form-control" formControlName="numeroPlace" placeholder="Ex: Rang 4, Place 12"
+                         [class.is-invalid]="form.get('numeroPlace')?.touched && form.get('numeroPlace')?.invalid">
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Section Choix de la Place -->
-          <div class="col-12">
-            <div class="card border-0 shadow-sm overflow-hidden">
-              <div class="card-header bg-secondary text-white py-3">
-                <h5 class="card-title mb-0"><i class="bi bi-ticket-perforated me-2"></i> 3. Votre place</h5>
-              </div>
-              <div class="card-body p-4">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Catégorie de place</label>
-                    <select class="form-select" formControlName="place" [disabled]="!selectedEvenement"
-                            [class.is-invalid]="form.get('place')?.touched && form.get('place')?.invalid">
-                      <option value="" disabled>-- Choisir --</option>
-                      <option *ngFor="let type of selectedEvenement?.typesPlace" [value]="type">{{ type }}</option>
-                    </select>
-                    <div class="invalid-feedback">Veuillez choisir une catégorie.</div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Numéro souhaité</label>
-                    <input type="text" class="form-control" formControlName="numeroPlace" placeholder="Ex: Rang 4, Place 12"
-                           [class.is-invalid]="form.get('numeroPlace')?.touched && form.get('numeroPlace')?.invalid">
-                  </div>
-
-                  <!-- Résumé du prix -->
-                  <div class="col-12 mt-4" *ngIf="form.get('prix')?.value! > 0">
-                    <div class="d-flex justify-content-between align-items-center p-3 bg-success bg-opacity-10 border-start border-success border-4 rounded">
-                      <div>
-                        <span class="text-success fw-bold fs-5">Total à régler</span>
-                        <div class="text-muted small">Confirmation immédiate après paiement</div>
-                      </div>
-                      <div class="text-success fw-bold fs-2">
-                        {{ form.get('prix')?.value }} €
-                      </div>
-                    </div>
+              <!-- Price Display & Action -->
+              <div class="mt-5">
+                <div class="price-display shadow-lg" [style.opacity]="form.get('prix')?.value! > 0 ? '1' : '0.5'">
+                  <div class="price-label">Prix Total à Payer</div>
+                  <div class="price-value">{{ form.get('prix')?.value || 0 }} €</div>
+                  <div class="small mt-2" *ngIf="form.get('prix')?.value! === 0">
+                    <i class="bi bi-info-circle me-1"></i> Sélectionnez une catégorie pour voir le prix
                   </div>
                 </div>
-              </div>
-              <div class="card-footer bg-light p-4">
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm py-3" [disabled]="isSubmitting">
+
+                <div class="mt-4">
+                  <button type="submit" class="btn btn-confirm shadow-lg"
+                          [disabled]="isSubmitting || form.get('prix')?.value! === 0">
                     <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                    <i class="bi bi-credit-card me-2"></i> CONFIRMER ET PAYER
+                    {{ isSubmitting ? 'Traitement en cours...' : 'CONFIRMER ET PAYER MAINTENANT' }}
                   </button>
+                  <div class="text-center mt-3 text-danger fw-bold" *ngIf="form.touched && form.invalid && !errorMessage">
+                    Certains champs sont invalides ou manquants.
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </form>
 
+        <div class="text-center mt-5 mb-5 text-muted">
+          <p class="fw-bold mb-1">© 2026 EventManager - Plateforme de Billetterie</p>
+          <p class="small">Service sécurisé & Confirmation instantanée</p>
         </div>
-      </form>
 
-      <!-- Footer public -->
-      <div class="text-center mt-5 mb-4 text-muted small">
-        &copy; 2024 EventManager. Plateforme de billetterie sécurisée.
       </div>
-
     </div>
   </div>
 </div>

@@ -18,6 +18,14 @@
 
   <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="card-body p-4">
+      
+      <!-- Message d'erreur -->
+      <div *ngIf="errorMessage" class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+        <div class="fw-bold">{{ errorMessage }}</div>
+        <button type="button" class="btn-close ms-auto" (click)="errorMessage = null" aria-label="Close"></button>
+      </div>
+
       <div class="row g-4">
         <div class="col-md-6">
           <label class="form-label fw-semibold">Référence Place <span class="text-danger">*</span></label>
@@ -65,8 +73,8 @@
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
             <select class="form-select border-start-0 ps-0" formControlName="evenementId" [class.is-invalid]="form.get('evenementId')?.touched && form.get('evenementId')?.invalid">
-              <option [value]="0">Choisir un événement...</option>
-              <option *ngFor="let e of evenements" [value]="e.id">{{ e.libelle }} ({{ formatDate(e.date) }})</option>
+              <option [ngValue]="0">Choisir un événement...</option>
+              <option *ngFor="let e of evenements" [ngValue]="e.id">{{ e.libelle }} ({{ formatDate(e.date) }})</option>
             </select>
             <div class="invalid-feedback">L'événement est obligatoire.</div>
           </div>
@@ -77,8 +85,8 @@
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
             <select class="form-select border-start-0 ps-0" formControlName="utilisateurId" [class.is-invalid]="form.get('utilisateurId')?.touched && form.get('utilisateurId')?.invalid">
-              <option [value]="0">Choisir un utilisateur...</option>
-              <option *ngFor="let u of utilisateurs" [value]="u.id">{{ u.prenom }} {{ u.nom }} ({{ u.email }})</option>
+              <option [ngValue]="0">Choisir un utilisateur...</option>
+              <option *ngFor="let u of utilisateurs" [ngValue]="u.id">{{ u.prenom }} {{ u.nom }} ({{ u.email }})</option>
             </select>
             <div class="invalid-feedback">L'utilisateur est obligatoire.</div>
           </div>

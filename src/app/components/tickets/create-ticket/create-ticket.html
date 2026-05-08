@@ -33,8 +33,8 @@
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
             <select class="form-select border-start-0 ps-0" formControlName="evenementId" [class.is-invalid]="form.get('evenementId')?.touched && form.get('evenementId')?.invalid">
-              <option [value]="0" disabled>-- Choisir l'événement cible --</option>
-              <option *ngFor="let ev of evenements" [value]="ev.id">
+              <option [ngValue]="0" disabled>-- Choisir l'événement cible --</option>
+              <option *ngFor="let ev of evenements" [ngValue]="ev.id">
                 {{ ev.libelle }} ({{ formatDate(ev.date) }} - Capacité: {{ ev.capacite }})
               </option>
             </select>
@@ -48,8 +48,8 @@
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-bounding-box"></i></span>
             <select class="form-select border-start-0 ps-0" formControlName="utilisateurId" [class.is-invalid]="form.get('utilisateurId')?.touched && form.get('utilisateurId')?.invalid">
-              <option [value]="0" disabled>-- Sélectionner le membre --</option>
-              <option *ngFor="let user of utilisateurs" [value]="user.id">
+              <option [ngValue]="0" disabled>-- Sélectionner le membre --</option>
+              <option *ngFor="let user of utilisateurs" [ngValue]="user.id">
                 {{ user.prenom }} {{ user.nom }} ({{ user.email }})
               </option>
             </select>

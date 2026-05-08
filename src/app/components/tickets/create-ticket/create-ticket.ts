@@ -8,7 +8,7 @@ import { UtilisateurApiService } from '../../../services/utilisateur-api.service
 import { Ticket } from '../../../models/ticket';
 import { Evenement } from '../../../models/evenement';
 import { Utilisateur } from '../../../models/utilisateur';
-import { forkJoin, of, catchError } from 'rxjs';
+import { forkJoin, of, catchError, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-create-ticket',
@@ -34,16 +34,16 @@ export class CreateTicket implements OnInit {
   isLoading = true;
   errorMessage: string | null = null;
 
-  // Prix par type de place
+  // Prix par type de place (Harmonisé avec la billetterie publique)
   private readonly pricesMap: Record<string, number> = {
     'VIP': 150,
-    'Premium': 100,
-    'Gold': 120,
-    'Silver': 80,
-    'Standard': 50,
-    'Loge': 200,
-    'Balcon': 75,
-    'Orchestre': 90
+    'PREMIUM': 100,
+    'GOLD': 120,
+    'SILVER': 80,
+    'STANDARD': 50,
+    'LOGE': 200,
+    'BALCON': 75,
+    'ORCHESTRE': 90
   };
 
   constructor(
@@ -60,23 +60,31 @@ export class CreateTicket implements OnInit {
       evenements: this.evenementService.getEvenements().pipe(catchError(() => of([]))),
       utilisateurs: this.utilisateurService.getUtilisateurs().pipe(catchError(() => of([])))
     }).subscribe(({ evenements, utilisateurs }) => {
-      this.evenements = evenements;
-      this.utilisateurs = utilisateurs;
+      this.evenements = evenements || [];
+      this.utilisateurs = utilisateurs || [];
       this.isLoading = false;
       this.cdr.detectChanges();
     });
 
     // Mettre à jour la liste des types de places quand l'événement change
     this.form.get('evenementId')?.valueChanges.subscribe(id => {
-      const ev = this.evenements.find(e => e.id === Number(id));
+      const numericId = Number(id);
+      const ev = this.evenements.find(e => e.id === numericId);
       this.selectedEventTypesPlace = ev?.typesPlace || [];
       this.cdr.detectChanges();
     });
 
     // Mettre à jour le prix quand le type de place change
     this.form.get('place')?.valueChanges.subscribe(placeType => {
-      if (placeType && this.pricesMap[placeType]) {
-        this.form.patchValue({ prix: this.pricesMap[placeType] });
+      if (placeType) {
+        const upperType = String(placeType).toUpperCase();
+        const foundPrice = this.pricesMap[upperType];
+        if (foundPrice) {
+          this.form.patchValue({ prix: foundPrice });
+        } else {
+          // Prix par défaut si non trouvé
+          this.form.patchValue({ prix: 50 });
+        }
       } else {
         this.form.patchValue({ prix: 0 });
       }
@@ -87,36 +95,63 @@ export class CreateTicket implements OnInit {
     this.errorMessage = null;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.errorMessage = "Certains champs obligatoires sont manquants.";
       return;
     }
 
-    // getRawValue permet de récupérer même les champs disabled (le statut)
     const payload = this.form.getRawValue() as any;
+    const evenementId = Number(payload.evenementId);
+    const utilisateurId = Number(payload.utilisateurId);
+
+    if (!evenementId || !utilisateurId) {
+      this.errorMessage = "Veuillez sélectionner un événement et un utilisateur.";
+      return;
+    }
+
     this.isSubmitting = true;
     this.cdr.detectChanges();
 
-    this.evenementService.getEvenementById(payload.evenementId).subscribe({
-      next: (event) => {
-        this.ticketService.getTicketsByEvenement(payload.evenementId).subscribe({
-          next: (tickets) => {
+    this.evenementService.getEvenementById(evenementId).pipe(
+      catchError(err => {
+        console.error('Erreur event fetch:', err);
+        return of({ capacite: 9999 } as any); // Fallback si l'event fetch échoue
+      }),
+      switchMap(event => {
+        return this.ticketService.getTicketsByEvenement(evenementId).pipe(
+          catchError(() => of([])),
+          switchMap(tickets => {
             const ticketList = tickets || [];
             const vendus = ticketList.filter(t => t?.statut === 'ACHETE').length;
-            if (vendus >= event.capacite && payload.statut === 'ACHETE') {
-              this.errorMessage = `Désolé, cet événement est complet (${event.capacite} places maximum).`;
-              this.isSubmitting = false;
-              this.cdr.detectChanges();
-            } else {
-              this.proceedWithCreation(payload);
+            
+            if (event.capacite > 0 && vendus >= event.capacite && payload.statut === 'ACHETE') {
+              throw new Error("COMPLET");
             }
-          },
-          error: () => {
-            this.proceedWithCreation(payload);
-            this.cdr.detectChanges();
-          }
-        });
+            
+            const ticketPayload: Ticket = {
+              numeroPlace: payload.numeroPlace,
+              place: payload.place,
+              prix: Number(payload.prix),
+              statut: payload.statut,
+              evenementId: evenementId,
+              utilisateurId: utilisateurId
+            };
+            return this.ticketService.createTicket(ticketPayload);
+          })
+        );
+      })
+    ).subscribe({
+      next: () => {
+        this.router.navigate(['/tickets'], { queryParams: { message: 'Ticket émis avec succès', type: 'success' } });
+        this.cdr.detectChanges();
       },
-      error: () => {
-        this.proceedWithCreation(payload);
+      error: (err) => {
+        this.isSubmitting = false;
+        console.error('Erreur émission ticket:', err);
+        if (err.message === "COMPLET") {
+          this.errorMessage = "Désolé, cet événement est complet.";
+        } else {
+          this.errorMessage = "Erreur serveur : " + (err.error?.message || err.message || "Enregistrement impossible");
+        }
         this.cdr.detectChanges();
       }
     });
